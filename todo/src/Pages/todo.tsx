@@ -1,9 +1,7 @@
-function todo() {
+export default function Todo() {
   return (
     <div>
-      <h1>Todo page</h1>
+      <h1>Todo page asd</h1>
     </div>
   );
 }
-
-export default todo;
