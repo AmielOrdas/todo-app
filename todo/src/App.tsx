@@ -1,7 +1,7 @@
 import Todo from "./Pages/Todo";
 import TaskFinishedList from "./Pages/Task-Finished-List";
 import { Route, Routes } from "react-router-dom";
-
+import "./index.css";
 function App() {
   return (
     <Routes>

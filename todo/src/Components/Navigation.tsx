@@ -2,10 +2,10 @@ import { Link } from "react-router-dom";
 
 export default function Navigation() {
   return (
-    <header>
+    <header className="flex justify-between bg-gray-400 p-5 ">
       <nav>
         <ul>
-          <li>
+          <li className="text-gray-600">
             <Link to="/">Todo</Link>
           </li>
           <li>
