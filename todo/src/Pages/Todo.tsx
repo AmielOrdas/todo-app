@@ -1,7 +1,13 @@
+import Navigation from "../Components/Navigation";
+
 export default function Todo() {
   return (
-    <div>
-      <h1>Todo page</h1>
-    </div>
+    <>
+      <Navigation />
+      <main>
+        <div></div>
+        <h1>Todo page</h1>
+      </main>
+    </>
   );
 }
