@@ -4,12 +4,10 @@ export default function Todo() {
   return (
     <>
       <Navigation />
-      <main className="h-screen bg-background-color-main pt-[175px]">
-        <div className="border-2 border-red-500 text-center">
+      <main className="min-h-screen bg-background-color-main pt-[175px]">
+        <div className="text-center">
           <TodoForm />
         </div>
-
-        <h1>Todo page</h1>
       </main>
     </>
   );

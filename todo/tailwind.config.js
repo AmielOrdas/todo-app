@@ -8,7 +8,8 @@ export default {
         "nav-bar-font-color": "#DEDEDE",
         "background-color-main": "#A8B77F",
         "form-color": "#D9D9D9",
-        "Input-green": "76B742",
+        "input-green": "#76B742",
+        "button-red": "#DC6247",
       },
       borderRadius: {
         "form-radius": "20px",
