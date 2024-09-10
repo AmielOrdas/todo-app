@@ -4,7 +4,7 @@ export default function Navigation() {
   return (
     <header className="bg-nav-bar-color p-5 ">
       <nav className="flex justify-between">
-        <img src={logo} className="lg:ml-20 lg:size-20 sm:size-40" />
+        <img src={logo} className="xl:ml-[150px] lg:size-20 sm:size-40" />
         <ul className="lg:flex justify-between items-center ">
           <li className="text-[24px] text-nav-bar-font-color px-8 max-lg: pb-1">
             <Link to="/">Todo</Link>

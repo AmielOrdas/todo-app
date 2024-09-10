@@ -6,6 +6,11 @@ export default {
       colors: {
         "nav-bar-color": "#673030",
         "nav-bar-font-color": "#DEDEDE",
+        "background-color-main": "#A8B77F",
+        "form-color": "#D9D9D9",
+      },
+      borderRadius: {
+        "form-radius": "20px",
       },
     },
   },
