@@ -1,5 +1,8 @@
 import Navigation from "../Components/Navigation";
 import TodoForm from "../Components/TodoForm";
+
+import "../index.css";
+
 export default function Todo() {
   return (
     <>
