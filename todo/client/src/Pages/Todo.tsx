@@ -9,34 +9,34 @@ export default function Todo() {
     messagePort: "",
   });
 
-  async function fetchMessage() {
-    try {
-      const response = await fetch("http://localhost:3000/newTodo", { method: "POST" }); // Fetch API will return a promise object that contains the HTTP response.
+  // async function fetchMessage() {
+  //   try {
+  //     const response = await fetch("http://localhost:3000/newTodo", { method: "POST" }); // Fetch API will return a promise object that contains the HTTP response.
 
-      if (!response.ok) {
-        throw new Error("Could not fetch resource"); // This will execute when fetching fails
-      }
+  //     if (!response.ok) {
+  //       throw new Error("Could not fetch resource"); // This will execute when fetching fails
+  //     }
 
-      const messageResponse = await response.json(); // This will convert the body of the HTTP response from JSON to a JavaScript object.
+  //     const messageResponse = await response.json(); // This will convert the body of the HTTP response from JSON to a JavaScript object.
 
-      if (typeof messageResponse.message !== typeof message.messagePort) {
-        throw new Error("Not equal");
-      }
+  //     if (typeof messageResponse.message !== typeof message.messagePort) {
+  //       throw new Error("Not equal");
+  //     }
 
-      setMessage({ messagePort: messageResponse.message });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  //     setMessage({ messagePort: messageResponse.message });
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
 
-  useEffect(() => {
-    fetchMessage();
-  }, []);
+  // useEffect(() => {
+  //   fetchMessage();
+  // }, []);
 
   return (
     <>
       <Navigation />
-      <main className="min-h-screen bg-background-color-main pt-[175px]">
+      <main className="min-h-screen bg-background-color-main pt-[120px]">
         <div className="text-center">
           <TodoForm />
         </div>

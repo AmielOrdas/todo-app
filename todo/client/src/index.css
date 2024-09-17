@@ -6,3 +6,7 @@
   margin: 0;
   padding: 0;
 }
+
+input:-webkit-autofill {
+  box-shadow: 0 0 0px 1000px #76b742 inset !important; /* This overrides autofill background and retain the custom background input color */
+}
