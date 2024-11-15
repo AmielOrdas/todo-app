@@ -1,5 +1,19 @@
 import { z } from "zod";
 
+export const ZloginSignupSchema = z.object({
+  email: z.string().email("Enter a valid email address!"),
+  password: z.string().min(8, "Password must be at least 8 characters!"),
+  confirmPassword: z.string().optional(),
+});
+
+export const ZsignupSchema = ZloginSignupSchema.refine(
+  (value) => value.confirmPassword === value.password,
+  {
+    message: "Passwords do not match!",
+    path: ["confirmPassword"],
+  }
+);
+
 export const ZnewTodoSchema = z.object({
   TaskName: z
     .string({
@@ -23,7 +37,9 @@ export const ZnewTodoSchema = z.object({
       },
       { message: "Task Deadline must be in the future" }
     ),
-  TaskDescription: z.string({ invalid_type_error: "Task Description must be a string" }),
+  TaskDescription: z.string({
+    invalid_type_error: "Task Description must be a string",
+  }),
   TaskImage: z
     .union([z.instanceof(FileList), z.instanceof(File)])
     .refine(
@@ -59,6 +75,8 @@ export const ZnewTodoSchema = z.object({
       { message: "File size must be less than 2MB" }
     ),
 });
+
+export type TloginSignupSchema = z.infer<typeof ZloginSignupSchema>;
 
 export type TnewTodoSchema = z.infer<typeof ZnewTodoSchema>;
 
