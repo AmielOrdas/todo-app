@@ -17,10 +17,7 @@ export default function Navigation() {
             <Link to="/finished-tasks">Task Finished List</Link>
           </li>
           <li className="hover:bg-[#441D1D] text-[24px] text-nav-bar-font-color px-8 max-lg: py-1 hover:font-bold">
-            <Link to="/login">Login</Link>
-          </li>
-          <li className="hover:bg-[#441D1D] text-[24px] text-nav-bar-font-color px-8 max-lg: py-1 hover:font-bold">
-            <Link to="/signup">Sign Up</Link>
+            <Link to="/login">Sign Out</Link>
           </li>
         </ul>
       </nav>

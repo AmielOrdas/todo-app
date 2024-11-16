@@ -83,3 +83,11 @@ export type TnewTodoSchema = z.infer<typeof ZnewTodoSchema>;
 export type TTaskImage = FileList | File | undefined;
 
 export const TImage = ["image/jpeg", "image/png", "image/gif"];
+
+// Types for  Pending Task Props
+export type TpendingTaskProps = {
+  taskImage: String[];
+  taskName: String[];
+  taskDeadline: Date[];
+  taskDescription: String[];
+};
