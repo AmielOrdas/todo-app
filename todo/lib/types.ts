@@ -86,8 +86,8 @@ export const TImage = ["image/jpeg", "image/png", "image/gif"];
 
 // Types for  Pending Task Props
 export type TpendingTaskProps = {
-  taskImage: String[];
-  taskName: String[];
-  taskDeadline: Date[];
-  taskDescription: String[];
+  taskImage: String;
+  taskName: String;
+  taskDeadline: Date;
+  taskDescription: String;
 };

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { TpendingTaskProps } from "../../../lib/types";
 
 export default function PendingForm({
@@ -7,39 +6,42 @@ export default function PendingForm({
   taskDeadline,
   taskDescription,
 }: TpendingTaskProps) {
-  // Stateful Variable for Page Number Checking
-  const [pageNum, setPageNum] = useState(0);
-  // Get Four Tasks per Page
-  function getFourTasks(taskArray) {
-    // Get the four tasks with respect to the activated page from the array
-    const fourTasks = taskArray.slice(pageNum * 4, (pageNum + 1) * 4);
-    // Convert the properties into strings
-    return fourTasks.map((value, index) =>
-      index === fourTasks.length - 1
-        ? ` ${String(value)}`
-        : ` ${String(value)},`
-    );
-  }
+  // function Done
+  // function Edit
+  // function Delete
 
-  function getAllTasks(taskArray) {
-    return taskArray.map((value, index) =>
-      index === taskArray.length - 1
-        ? ` ${String(value)}`
-        : ` ${String(value)},`
-    );
+  // Format Date
+  function formatDate(taskDeadline: Date) {
+    return `Due: ${taskDeadline.getFullYear()}-${
+      taskDeadline.getMonth() + 1
+    }-${taskDeadline.getDate()}\n${
+      taskDeadline.getHours() < 10 && taskDeadline.getHours() !== 0
+        ? `0${taskDeadline.getHours()}`
+        : taskDeadline.getHours() > 12
+        ? taskDeadline.getHours() % 12 < 10
+          ? `0${taskDeadline.getHours() % 12}`
+          : taskDeadline.getHours() % 12
+        : 12
+    }:${
+      taskDeadline.getMinutes() < 10
+        ? `0${taskDeadline.getMinutes()}`
+        : taskDeadline.getMinutes()
+    } ${taskDeadline.getHours() >= 12 ? "PM" : "AM"}`;
   }
 
   return (
     <div className="min-h-[327px] max-w-[339px] w-full bg-[#ADA823] rounded-form-radius">
       <div className="m-4 flex items-start">
-        <img className="w-[109px] h-[109px]" src={taskImage[0]} />
+        <img className="w-[109px] h-[109px]" src={String(taskImage)} />
         <div className="mx-auto my-auto">
-          <p className="text-xl">{taskName}</p>
-          <p className="text-xl">{String(taskDeadline[0])}</p>
+          <p className="text-xl text-center font-semibold">{taskName}</p>
+          <p className="text-xl text-center text-red-800">
+            {formatDate(taskDeadline)}
+          </p>
         </div>
       </div>
-      <div className="m-4 w-auto h-[107px] bg-white">
-        <p>{taskDescription[0]}</p>
+      <div className="m-4 w-auto h-[107px] bg-white overflow-y-scroll">
+        <p className="m-2">{taskDescription}</p>
       </div>
       <div className="m-4 flex justify-start space-x-4">
         <button className="bg-button-red p-1 rounded-lg hover:bg-red-900">
