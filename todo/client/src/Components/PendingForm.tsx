@@ -1,11 +1,12 @@
 import { TpendingTaskProps } from "../../../lib/types";
 
+// Omit "id" property since it will only be used as key when mapping
 export default function PendingForm({
   taskImage,
   taskName,
   taskDeadline,
   taskDescription,
-}: TpendingTaskProps) {
+}: Omit<TpendingTaskProps, "id">) {
   // function Done
   // function Edit
   // function Delete
@@ -41,7 +42,7 @@ export default function PendingForm({
         </div>
       </div>
       <div className="m-4 w-auto h-[107px] bg-white overflow-y-scroll">
-        <p className="m-2">{taskDescription}</p>
+        <p className="m-2 text-justify">{taskDescription}</p>
       </div>
       <div className="m-4 flex justify-start space-x-4">
         <button className="bg-button-red p-1 rounded-lg hover:bg-red-900">
