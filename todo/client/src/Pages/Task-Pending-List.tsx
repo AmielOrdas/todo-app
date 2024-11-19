@@ -9,13 +9,15 @@ export default function TaskPendingList() {
   const [currentPage, setCurrentPage] = useState(1);
   const tasksPerPage = 4;
 
+  // Add Status Property for One Array
+
   // Props for Testing PendingForm Component
-  const testProps: TpendingTaskProps[] = [
+  const [pendingTasks, setPendingTasks] = useState<TpendingTaskProps[]>([
     {
       id: 1,
       taskImage:
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuGQ4LhVFNt4fyeu6ZUpT_6KTxdeJ7yVpwxw&s",
-      taskName: "Test Task",
+      taskName: "Test Task 1",
       taskDeadline: new Date(2024, 11, 25, 13, 8),
       taskDescription:
         "Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore laboriosam animi id asperiores earum molestiae temporibus quibusdam accusantium tempora nam ullam fuga, voluptas ea omnis quasi consequatur minus obcaecati aperiam.",
@@ -24,7 +26,7 @@ export default function TaskPendingList() {
       id: 2,
       taskImage:
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuGQ4LhVFNt4fyeu6ZUpT_6KTxdeJ7yVpwxw&s",
-      taskName: "Test Task",
+      taskName: "Test Task 2",
       taskDeadline: new Date(2024, 11, 25, 13, 8),
       taskDescription:
         "Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore laboriosam animi id asperiores earum molestiae temporibus quibusdam accusantium tempora nam ullam fuga, voluptas ea omnis quasi consequatur minus obcaecati aperiam.",
@@ -33,7 +35,7 @@ export default function TaskPendingList() {
       id: 3,
       taskImage:
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuGQ4LhVFNt4fyeu6ZUpT_6KTxdeJ7yVpwxw&s",
-      taskName: "Test Task",
+      taskName: "Test Task 3",
       taskDeadline: new Date(2024, 11, 25, 13, 8),
       taskDescription:
         "Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore laboriosam animi id asperiores earum molestiae temporibus quibusdam accusantium tempora nam ullam fuga, voluptas ea omnis quasi consequatur minus obcaecati aperiam.",
@@ -42,7 +44,7 @@ export default function TaskPendingList() {
       id: 4,
       taskImage:
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuGQ4LhVFNt4fyeu6ZUpT_6KTxdeJ7yVpwxw&s",
-      taskName: "Test Task",
+      taskName: "Test Task 4",
       taskDeadline: new Date(2024, 11, 25, 13, 8),
       taskDescription:
         "Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore laboriosam animi id asperiores earum molestiae temporibus quibusdam accusantium tempora nam ullam fuga, voluptas ea omnis quasi consequatur minus obcaecati aperiam.",
@@ -51,21 +53,87 @@ export default function TaskPendingList() {
       id: 5,
       taskImage:
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuGQ4LhVFNt4fyeu6ZUpT_6KTxdeJ7yVpwxw&s",
-      taskName: "Test Task",
+      taskName: "Test Task 5",
       taskDeadline: new Date(2024, 11, 25, 13, 8),
       taskDescription:
         "Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore laboriosam animi id asperiores earum molestiae temporibus quibusdam accusantium tempora nam ullam fuga, voluptas ea omnis quasi consequatur minus obcaecati aperiam.",
     },
-  ];
+  ]);
+
+  // Placeholder Array for Tasks Done
+  const [doneTasks, setDoneTasks] = useState<TpendingTaskProps[]>([]);
+
+  // Function for editing pending task properties
+  const handleEdit = (
+    id: number,
+    newTaskName: string,
+    newTaskDeadline: Date,
+    newTaskDescription: string
+  ) => {
+    setPendingTasks((prevPendingTasks) =>
+      prevPendingTasks.map((pendingTask) =>
+        pendingTask.id === id
+          ? {
+              ...pendingTask,
+              taskName: newTaskName,
+              taskDeadline: newTaskDeadline,
+              taskDescription: newTaskDescription,
+            }
+          : pendingTask
+      )
+    );
+  };
+
+  // Function to move a pending task into the tasks done
+  const handleDone = (id: number) => {
+    setPendingTasks((prevPendingTasks) => {
+      const pendingTaskToDone = prevPendingTasks.find(
+        (pendingTask) => pendingTask.id === id
+      );
+
+      if (pendingTaskToDone) {
+        setDoneTasks((prevDoneTasks) => {
+          const newDoneTasks = [
+            ...prevDoneTasks,
+            { ...pendingTaskToDone, id: prevDoneTasks.length + 1 },
+          ];
+          return newDoneTasks;
+        });
+
+        // Remove the Task from Pending Tasks then Update IDs
+        const updatedPendingTasks = prevPendingTasks.filter(
+          (pendingTask) => pendingTask.id !== id
+        );
+        return updatedPendingTasks.map((pendingTask, index) => ({
+          ...pendingTask,
+          id: index + 1,
+        }));
+      }
+      return prevPendingTasks;
+    });
+  };
+
+  // Function to remove a pending task
+  const handleDelete = (id: number) => {
+    setPendingTasks((prevPendingTasks) => {
+      const updatedPendingTasks = prevPendingTasks.filter(
+        (prevPendingTask) => prevPendingTask.id !== id
+      );
+      return updatedPendingTasks.map((pendingTask, index) => ({
+        ...pendingTask,
+        id: index + 1,
+      }));
+    });
+  };
 
   // Set the Indexes based on Number of Tasks and Current Page
   const startIndex = (currentPage - 1) * tasksPerPage;
   const endIndex = startIndex + tasksPerPage;
-  const currentPendingTasks = testProps.slice(startIndex, endIndex);
+  const currentPendingTasks = pendingTasks.slice(startIndex, endIndex);
 
   // Create Function to Handle Forward Paging
   const nextPage = () => {
-    if (currentPage < Math.ceil(testProps.length / tasksPerPage)) {
+    if (currentPage < Math.ceil(pendingTasks.length / tasksPerPage)) {
       setCurrentPage((currentP) => currentP + 1);
     }
   };
@@ -85,10 +153,10 @@ export default function TaskPendingList() {
           {currentPendingTasks.map((task) => (
             <PendingForm
               key={task.id}
-              taskImage={task.taskImage}
-              taskName={task.taskName}
-              taskDeadline={task.taskDeadline}
-              taskDescription={task.taskDescription}
+              {...task}
+              onEdit={handleEdit}
+              onDone={handleDone}
+              onDelete={handleDelete}
             />
           ))}
         </div>
@@ -103,7 +171,7 @@ export default function TaskPendingList() {
           <button
             onClick={nextPage}
             disabled={
-              currentPage === Math.ceil(testProps.length / tasksPerPage)
+              currentPage === Math.ceil(pendingTasks.length / tasksPerPage)
             }
             className="text-2xl font-bold bg-button-red rounded px-2 py-1 hover:bg-red-900 disabled:bg-red-900"
           >
@@ -111,6 +179,13 @@ export default function TaskPendingList() {
           </button>
         </div>
       </main>
+      {/*THIS PART SHOULD MOVE IT INTO THE TASK DONE PAGE*/}
+      <h1>DONE TASKS</h1>
+      <div>
+        {doneTasks.map((task) => (
+          <PendingForm key={task.id} {...task} />
+        ))}
+      </div>
     </>
   );
 }

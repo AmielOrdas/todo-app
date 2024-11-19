@@ -85,10 +85,11 @@ export type TTaskImage = FileList | File | undefined;
 export const TImage = ["image/jpeg", "image/png", "image/gif"];
 
 // Types for  Pending Task Props
-export type TpendingTaskProps = {
-  id: number;
-  taskImage: String;
-  taskName: String;
-  taskDeadline: Date;
-  taskDescription: String;
-};
+export const ZpendingTaskSchema = z.object({
+  id: z.number().int(),
+  taskImage: z.string(),
+  taskName: z.string().min(1, "Task name is required!"),
+  taskDeadline: z.date(),
+  taskDescription: z.string().min(1, "A task description must be entered!"),
+});
+export type TpendingTaskProps = z.infer<typeof ZpendingTaskSchema>;
