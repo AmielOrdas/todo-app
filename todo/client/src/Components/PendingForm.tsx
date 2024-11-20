@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { TpendingTaskProps } from "../../../lib/types";
 
-// Omit "id" property since it will only be used as key when mapping
-// Add the Boolean Variables for Edit/Done/Delete
+// Remove "Edit" Button for Finished Tasks and Add "Delete" Button
 
 type TmodifiedTaskPendingProps = TpendingTaskProps & {
   onEdit?: (
@@ -28,21 +27,23 @@ export default function PendingForm({
   // Use Stateful Variables for Editing
   const [isEditing, setIsEditing] = useState(false);
   const [editedTaskName, setEditedTaskName] = useState(taskName);
-  const [editedDate, setEditedDate] = useState(
-    taskDeadline.toISOString().substring(0, 10)
-  );
-  const [editedTime, setEditedTime] = useState(
-    taskDeadline.toISOString().substring(11, 16)
-  );
+  const [editedDeadline, setEditedDeadline] = useState(
+    taskDeadline.toISOString().slice(0, 16)
+  ); // Datetime-local input
   const [editedTaskDescription, setEditedTaskDescription] =
     useState(taskDescription);
 
   // Function to handle updating
   const handleSaveEdit = () => {
     if (onEdit) {
-      const updatedDeadline = new Date(`${editedDate}T${editedTime}`);
-      onEdit(id, editedTaskName, updatedDeadline, editedTaskDescription);
+      const newTaskDeadline = new Date(editedDeadline);
+      onEdit(id, editedTaskName, newTaskDeadline, editedTaskDescription);
     }
+    setIsEditing(false);
+  };
+
+  // Function to Cancel Editing
+  const handleCancelEdit = () => {
     setIsEditing(false);
   };
 
@@ -87,16 +88,10 @@ export default function PendingForm({
                 className="text-xl w-full overflow-hidden m-1"
               />
               <input
-                type="date"
-                value={editedDate}
-                onChange={(e) => setEditedDate(e.target.value)}
-                className="text-xl text-center text-black w-full m-1"
-              />
-              <input
-                type="time"
-                value={editedTime}
-                onChange={(e) => setEditedTime(e.target.value)}
-                className="text-xl text-center text-black w-full m-1"
+                type="datetime-local"
+                value={editedDeadline}
+                onChange={(e) => setEditedDeadline(e.target.value)}
+                className="text-l text-center text-black w-full m-1"
               />
             </div>
           </div>
@@ -115,6 +110,12 @@ export default function PendingForm({
               className="bg-button-red p-1 rounded-lg hover:bg-red-900 disabled:bg-red-900"
             >
               Save
+            </button>
+            <button
+              onClick={handleCancelEdit}
+              className="bg-button-red p-1 rounded-lg hover:bg-red-900 disabled:bg-red-900"
+            >
+              Cancel
             </button>
           </div>
         </>

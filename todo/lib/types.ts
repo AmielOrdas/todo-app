@@ -87,9 +87,12 @@ export const TImage = ["image/jpeg", "image/png", "image/gif"];
 // Types for  Pending Task Props
 export const ZpendingTaskSchema = z.object({
   id: z.number().int(),
+  isDone: z.boolean(),
   taskImage: z.string(),
   taskName: z.string().min(1, "Task name is required!"),
   taskDeadline: z.date(),
   taskDescription: z.string().min(1, "A task description must be entered!"),
 });
 export type TpendingTaskProps = z.infer<typeof ZpendingTaskSchema>;
+
+// MAKE SCHEMA AND PROPERTIES CONSISTENT THROUGHOUT DIFFERENT PAGES?
