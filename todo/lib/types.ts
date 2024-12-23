@@ -17,7 +17,9 @@ export const ZnewTodoSchema = z.object({
     .min(1, { message: "Task Deadline is required" })
     .refine(
       (value) => {
+        console.log(value, typeof value);
         const date = new Date(value);
+        console.log(date, date instanceof Date);
         date.setHours(23, 59, 59, 59);
         return date >= new Date();
       },

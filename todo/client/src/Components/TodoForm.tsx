@@ -19,7 +19,6 @@ export default function TodoForm() {
   useEffect(() => {
     console.log("Hello");
     if (taskImage instanceof FileList && taskImage.length > 0) {
-      console.log("Hi");
       console.log("taskImage", taskImage);
       fileRef.current = taskImage;
 
@@ -97,7 +96,6 @@ export default function TodoForm() {
           return "No file chosen";
         }
       }
-      return fileList[0].name;
     } else if (value instanceof File) {
       const file: File = value;
       // setValue("TaskImage", file);

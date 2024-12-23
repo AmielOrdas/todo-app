@@ -1,5 +1,5 @@
 import express from "express";
-import newTodoRoute from "./routes/newTodo";
+import TodoRoutes from "./routes/TodoRoutes";
 import cors from "cors";
 const app = express();
 const PORT = 3000;
@@ -7,7 +7,7 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-app.use("/newTodo", newTodoRoute);
+app.use("/Todo", TodoRoutes);
 
 app.listen(PORT, () => {
   console.log(`Running on Port ${PORT}`);
