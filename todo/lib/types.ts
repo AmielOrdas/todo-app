@@ -1,5 +1,19 @@
 import { z } from "zod";
 
+export const ZloginSignupSchema = z.object({
+  email: z.string().email("Enter a valid email address!"),
+  password: z.string().min(8, "Password must be at least 8 characters!"),
+  confirmPassword: z.string().optional(),
+});
+
+export const ZsignupSchema = ZloginSignupSchema.refine(
+  (value) => value.confirmPassword === value.password,
+  {
+    message: "Passwords do not match!",
+    path: ["confirmPassword"],
+  }
+);
+
 export const ZnewTodoSchema = z.object({
   TaskName: z
     .string({
@@ -25,7 +39,9 @@ export const ZnewTodoSchema = z.object({
       },
       { message: "Task Deadline must be in the future" }
     ),
-  TaskDescription: z.string({ invalid_type_error: "Task Description must be a string" }),
+  TaskDescription: z.string({
+    invalid_type_error: "Task Description must be a string",
+  }),
   TaskImage: z
     .union([z.instanceof(FileList), z.instanceof(File)])
     .refine(
@@ -62,8 +78,23 @@ export const ZnewTodoSchema = z.object({
     ),
 });
 
+export type TloginSignupSchema = z.infer<typeof ZloginSignupSchema>;
+
 export type TnewTodoSchema = z.infer<typeof ZnewTodoSchema>;
 
 export type TTaskImage = FileList | File | undefined;
 
 export const TImage = ["image/jpeg", "image/png", "image/gif"];
+
+// Types for  Pending Task Props
+export const ZpendingTaskSchema = z.object({
+  id: z.number().int(),
+  isDone: z.boolean(),
+  taskImage: z.string(),
+  taskName: z.string().min(1, "Task name is required!"),
+  taskDeadline: z.date(),
+  taskDescription: z.string().min(1, "A task description must be entered!"),
+});
+export type TpendingTaskProps = z.infer<typeof ZpendingTaskSchema>;
+
+// MAKE SCHEMA AND PROPERTIES CONSISTENT THROUGHOUT DIFFERENT PAGES?
