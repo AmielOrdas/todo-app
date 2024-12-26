@@ -1,11 +1,25 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import TodoRoutes from "./routes/TodoRoutes";
 import cors from "cors";
+import { connectMongoAtlas, getDBVariables } from "./database/db";
+import { MongoClient } from "mongodb";
+
 const app = express();
 const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
+
+(async function dbConnect() {
+  try {
+    await connectMongoAtlas();
+    console.log("Connected to MongoDB Atlas");
+  } catch (error) {
+    console.error(`Cannot connect to mongoDB Atlas. Error Message: ${error}`);
+  }
+})();
+
+const { TaskCollection, UserCollection } = getDBVariables();
 
 app.use("/Todo", TodoRoutes);
 
@@ -13,7 +27,7 @@ app.listen(PORT, () => {
   console.log(`Running on Port ${PORT}`);
 });
 
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
   console.log("Hello from server side!");
   res.send({ message: "Hello from Server side!" });
 });
