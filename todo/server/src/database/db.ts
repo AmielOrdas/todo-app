@@ -1,14 +1,11 @@
 import { MongoClient, Collection } from "mongodb";
 import dotenv from "dotenv";
+import { collections } from "../../../lib/types";
 
 dotenv.config({ path: "../.env" });
 
 const dbURI = process.env.dbURI || "";
 let client: MongoClient;
-type collections = {
-  TaskCollection: Collection;
-  UserCollection: Collection;
-};
 
 async function connectMongoAtlas(): Promise<MongoClient> {
   client = new MongoClient(dbURI);

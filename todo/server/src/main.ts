@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import TodoRoutes from "./routes/TodoRoutes";
+import TaskRoutes from "./routes/TaskRoutes";
 import cors from "cors";
 import { connectMongoAtlas, getDBVariables } from "./database/db";
 import { MongoClient } from "mongodb";
@@ -21,7 +21,7 @@ app.use(express.json());
 
 const { TaskCollection, UserCollection } = getDBVariables();
 
-app.use("/Todo", TodoRoutes);
+app.use("/tasks", TaskRoutes);
 
 app.listen(PORT, () => {
   console.log(`Running on Port ${PORT}`);

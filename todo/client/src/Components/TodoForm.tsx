@@ -1,6 +1,11 @@
 import { useForm, type FieldValues } from "react-hook-form";
 import { useState, ChangeEvent, useRef, useEffect } from "react";
-import { TImage, TnewTodoSchema, ZnewTodoSchema, TTaskImage } from "../../../lib/types";
+import {
+  TImage,
+  TnewTodoSchema,
+  ZnewTaskSchemaClient,
+  TTaskImage,
+} from "../../../lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 export default function TodoForm() {
   const {
@@ -67,16 +72,15 @@ export default function TodoForm() {
   // }
 
   async function SubmitData(data: TnewTodoSchema) {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // try {
-    //   const response = await fetch("http://localhost:3000/newTodo", { method: "POST" }); // Fetch API will return a promise object that contains the HTTP response.
-    //   if (!response.ok) {
-    //     throw new Error("Could not fetch response"); // This will execute when fetching fails
-    //   }
-    //   const messageResponse = await response.json(); // This will convert the body of the HTTP response from JSON to a JavaScript object.
-    // } catch (error) {
-    //   console.error(error);
-    // }
+    try {
+      const response = await fetch("http://localhost:3000/Form", { method: "POST" }); // Fetch API will return a promise object that contains the HTTP response.
+      if (!response.ok) {
+        throw new Error("Could not fetch response"); // This will execute when fetching fails
+      }
+      const messageResponse = await response.json(); // This will convert the body of the HTTP response from JSON to a JavaScript object.
+    } catch (error) {
+      console.error(error);
+    }
     console.log("Submitted!");
     reset();
   }
