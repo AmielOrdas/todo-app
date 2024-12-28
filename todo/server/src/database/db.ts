@@ -7,10 +7,11 @@ dotenv.config({ path: "../.env" });
 const dbURI = process.env.dbURI || "";
 let client: MongoClient;
 
-async function connectMongoAtlas(): Promise<MongoClient> {
-  client = new MongoClient(dbURI);
-  await client.connect();
-  return client;
+async function connectMongoAtlas() {
+  if (!client) {
+    client = new MongoClient(dbURI);
+    await client.connect();
+  }
 }
 
 function getDBVariables(): collections {

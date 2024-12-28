@@ -11,7 +11,7 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-(async function dbConnect() {
+(async () => {
   try {
     await connectMongoAtlas();
     console.log("Connected to MongoDB Atlas");
