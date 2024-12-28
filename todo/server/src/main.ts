@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import TaskRoutes from "./routes/TaskRoutes";
+import UserRoutes from "./routes/UserRoutes";
 import cors from "cors";
 import { connectMongoAtlas, getDBVariables } from "./database/db";
 import { MongoClient } from "mongodb";
@@ -19,7 +20,9 @@ app.use(express.json());
   }
 })();
 
-const { TaskCollection, UserCollection } = getDBVariables();
+export const { TaskCollection, UserCollection } = getDBVariables();
+
+app.use("/users", UserRoutes);
 
 app.use("/tasks", TaskRoutes);
 

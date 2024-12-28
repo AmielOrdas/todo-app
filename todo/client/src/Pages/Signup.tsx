@@ -17,12 +17,26 @@ export default function Signup() {
   });
 
   // Handle Sign Up Submission to Server After Validation
-  const ToggleSignup = async (data: TloginSignupSchema) => {
-    // Insert Submission to Server
-    // ...
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  async function HandleSignup(data: TloginSignupSchema) {
+    try {
+      // Change url
+      const response = await fetch("http://localhost:3000/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error("Could not fetch response");
+      }
+      const messageResponse = await response.json();
+      console.log(messageResponse.message);
+      console.log("Signup successful");
+    } catch (error) {
+      console.error(error);
+    }
     reset();
-  };
+  }
+
   return (
     <main className="min-h-screen bg-background-color-main">
       <NavigateAuthentication />
@@ -37,7 +51,7 @@ export default function Signup() {
           <h1 className="text-center pt-2 text-2xl font-semibold">
             Sign Up Account
           </h1>
-          <form onSubmit={handleSubmit(ToggleSignup)}>
+          <form onSubmit={handleSubmit(HandleSignup)}>
             <div className="m-4">
               <h1 className="text-lg">Email:</h1>
               <input
