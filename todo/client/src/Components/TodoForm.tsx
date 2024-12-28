@@ -2,7 +2,7 @@ import { useForm, type FieldValues } from "react-hook-form";
 import { useState, ChangeEvent, useRef, useEffect } from "react";
 import {
   TImage,
-  TnewTodoSchema,
+  TnewTaskSchemaClient,
   ZnewTaskSchemaClient,
   TTaskImage,
 } from "../../../lib/types";
@@ -17,7 +17,7 @@ export default function TodoForm() {
     setValue,
     watch,
     trigger,
-  } = useForm<TnewTodoSchema>({ resolver: zodResolver(ZnewTodoSchema) });
+  } = useForm<TnewTaskSchemaClient>({ resolver: zodResolver(ZnewTaskSchemaClient) });
   const fileRef = useRef<TTaskImage>(undefined);
   const taskImage: TTaskImage = watch("TaskImage");
 
@@ -71,7 +71,7 @@ export default function TodoForm() {
   //   }
   // }
 
-  async function SubmitData(data: TnewTodoSchema) {
+  async function SubmitData(data: TnewTaskSchemaClient) {
     try {
       const response = await fetch("http://localhost:3000/Form", { method: "POST" }); // Fetch API will return a promise object that contains the HTTP response.
       if (!response.ok) {
