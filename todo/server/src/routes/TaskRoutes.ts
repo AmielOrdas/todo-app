@@ -39,7 +39,9 @@ router.get("/", (req: Request, res: Response) => {
 router
   .route("/:id")
   .get((req: Request, res: Response) => {
-    res.send({ message: `Hello from get specific form with an ID of ${req.params.id}` });
+    res.send({
+      message: `Hello from get specific form with an ID of ${req.params.id}`,
+    });
   })
   .put((req: Request, res: Response) => {
     res.send({

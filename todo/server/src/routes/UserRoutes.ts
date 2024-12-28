@@ -8,7 +8,7 @@ const router = express.Router();
 router.post("/login", async (req: Request, res: Response) => {
   try {
     // Get Input from Client
-    const loginData = ZloginSignupSchema.parse(req.body);
+    // const loginData = ZloginSignupSchema.safeParse(req.body);
     // Insert validation for authentication
 
     return res
@@ -29,11 +29,11 @@ router.post("/login", async (req: Request, res: Response) => {
 router.post("/signup", async (req: Request, res: Response) => {
   try {
     // Get data from client
-    const signupData = ZsignupSchema.parse(req.body);
+    // const signupData = ZsignupSchema.safeParse(req.body);
     // Insert validation for authentication
 
     // Insert data to database
-    await UserCollection.insertOne({ signupData });
+    // await UserCollection.insertOne({ signupData });
     return res
       .sendStatus(201)
       .json({ message: "Account Successfully Created" });
