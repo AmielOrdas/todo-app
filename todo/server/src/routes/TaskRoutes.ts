@@ -1,19 +1,14 @@
 import express, { Request, Response } from "express";
-import {
-  TImage,
-  TnewTaskSchemaServer,
-  ZnewTaskSchemaServer,
-  TTaskImage,
-} from "../../../lib/types";
+import { ZnewTaskSchemaServer } from "../../../lib/serverTypes";
 import { parse } from "dotenv";
 import { ZodError } from "zod";
+import { connectMongoAtlas } from "../database/db";
 const router = express.Router();
 
 router.post("/", (req: Request, res: Response) => {
   try {
     // const { TaskName, TaskDeadline, TaskDescription, TaskImage } = req.body;
-    const parseResult = ZnewTaskSchemaServer.safeParse(req.body);
-
+    ZnewTaskSchemaServer.safeParse(req.body);
     res.sendStatus(401).json({
       message: "New Task Created Successfully",
     });

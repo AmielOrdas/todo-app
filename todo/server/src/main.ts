@@ -10,7 +10,7 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-(async function dbConnect() {
+(async () => {
   try {
     await connectMongoAtlas();
     console.log("Connected to MongoDB Atlas");
@@ -18,8 +18,6 @@ app.use(express.json());
     console.error(`Cannot connect to mongoDB Atlas. Error Message: ${error}`);
   }
 })();
-
-const { TaskCollection, UserCollection } = getDBVariables();
 
 app.use("/tasks", TaskRoutes);
 
