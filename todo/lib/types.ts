@@ -15,6 +15,9 @@ export const ZsignupSchema = ZloginSignupSchema.refine(
   }
 );
 
+if (typeof window !== "undefined") {
+}
+
 export const ZnewTaskSchemaClient = z.object({
   TaskName: z
     .string({
