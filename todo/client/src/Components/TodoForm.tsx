@@ -21,17 +21,17 @@ export default function TodoForm() {
   const fileRef = useRef<TTaskImage>(undefined);
   const taskImage: TTaskImage = watch("TaskImage");
 
-  useEffect(() => {
-    console.log("Hello");
-    if (taskImage instanceof FileList && taskImage.length > 0) {
-      console.log("taskImage", taskImage);
-      fileRef.current = taskImage;
+  // useEffect(() => {
+  //   console.log("Hello");
+  //   if (taskImage instanceof FileList && taskImage.length > 0) {
+  //     console.log("taskImage", taskImage);
+  //     fileRef.current = taskImage;
 
-      console.log("fileRefUseEffect", fileRef.current);
-    } else if (taskImage instanceof File) {
-      fileRef.current = taskImage;
-    }
-  }, [taskImage]);
+  //     console.log("fileRefUseEffect", fileRef.current);
+  //   } else if (taskImage instanceof File) {
+  //     fileRef.current = taskImage;
+  //   }
+  // }, [taskImage]);
 
   // function handleFileUpload(e: ChangeEvent<HTMLInputElement>) {
   //   const file = e.target.files?.[0];
@@ -73,7 +73,11 @@ export default function TodoForm() {
 
   async function SubmitData(data: TnewTaskSchemaClient) {
     try {
-      const response = await fetch("http://localhost:3000/Form", { method: "POST" }); // Fetch API will return a promise object that contains the HTTP response.
+      const response = await fetch("http://localhost:3000/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }); // Fetch API will return a promise object that contains the HTTP response.
       if (!response.ok) {
         throw new Error("Could not fetch response"); // This will execute when fetching fails
       }
@@ -84,8 +88,8 @@ export default function TodoForm() {
     console.log("Submitted!");
     reset();
   }
-  console.log("fileRef: ", fileRef.current);
-  console.log(taskImage);
+  // console.log("fileRef: ", fileRef.current);
+  // console.log(taskImage);
 
   function CheckFileInput(value: TTaskImage) {
     if (value instanceof FileList) {

@@ -12,7 +12,6 @@ export const ZnewTaskSchemaServer = z.object({
     .refine((value) => value.trim().length > 0, {
       message: "Task Name cannot be blank",
     }),
-
   TaskDeadline: z
     .string({ required_error: "Task Deadline must be a string" })
     .min(1, { message: "Task Deadline is required" })

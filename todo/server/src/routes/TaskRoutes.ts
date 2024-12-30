@@ -3,29 +3,16 @@ import { ZnewTaskSchemaServer } from "../../../lib/serverTypes";
 import { parse } from "dotenv";
 import { ZodError } from "zod";
 import { connectMongoAtlas } from "../database/db";
+import { validateTask } from "../../../lib/middleware";
 const router = express.Router();
 
-router.post("/", (req: Request, res: Response) => {
-  try {
-    // const { TaskName, TaskDeadline, TaskDescription, TaskImage } = req.body;
-    ZnewTaskSchemaServer.safeParse(req.body);
-    res.sendStatus(401).json({
-      message: "New Task Created Successfully",
-    });
-  } catch (error) {
-    if (error instanceof ZodError) {
-      return res.status(400).json({
-        error: "Validation failed",
-        details: error.errors,
-      });
-    } else {
-      console.error("Unexpected Error: ", error);
-      return res.status(500).json({
-        error: "Unexpected Error",
-      });
-    }
+router.post(
+  "/",
+  validateTask(ZnewTaskSchemaServer) as any,
+  (req: Request, res: Response) => {
+    console.log("Test");
   }
-});
+);
 
 router.get("/", (req: Request, res: Response) => {
   res.send({ message: "Hello from get all forms" });
