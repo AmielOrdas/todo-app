@@ -30,3 +30,17 @@ export const ZnewTaskSchemaServer = z.object({
     invalid_type_error: "Task Description must be a string",
   }),
 });
+
+export const ZloginSignupSchemaServer = z.object({
+  email: z.string().email("Enter a valid email address!"),
+  password: z.string().min(8, "Password must be at least 8 characters!"),
+  confirmPassword: z.string().optional(),
+});
+
+export const ZsignupSchemaServer = ZloginSignupSchemaServer.refine(
+  (value) => value.confirmPassword === value.password,
+  {
+    message: "Passwords do not match!",
+    path: ["confirmPassword"],
+  }
+);
