@@ -1,7 +1,7 @@
 import { parse } from "dotenv";
 import { Request, Response, NextFunction } from "express";
 
-export function validateTask(schema: any) {
+export function validateData(schema: any) {
   return (req: Request, res: Response, next: NextFunction) => {
     const parseResult = schema.safeParse(req.body);
 
