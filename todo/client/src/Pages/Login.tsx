@@ -4,6 +4,8 @@ import "../index.css";
 import { useForm } from "react-hook-form";
 import { TloginSignupSchema, ZloginSignupSchema } from "../../../lib/types";
 import NavigateAuthentication from "../Components/NavigateAuthentication";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   // Setup Schema
@@ -16,26 +18,53 @@ export default function Login() {
     resolver: zodResolver(ZloginSignupSchema),
   });
 
+  const navigateTo = useNavigate();
+
+  // Set Credential to Allow
+  axios.defaults.withCredentials = true;
+
   // Handle Login Submission to Server
   async function HandleLogin(data: TloginSignupSchema) {
     try {
-      // Change url
-      const response = await fetch("http://localhost:3000/users/login", {
-        method: "POST",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error("Could not fetch response");
+      const response = await axios.post(
+        "http://localhost:3000/users/login",
+        data,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      console.log(response.data.message);
+
+      // Template for Varying Output from Server Response
+      if (response.data.Status === "Success") {
+        // Navigate to Todo Page After Account Login
+        navigateTo("/");
       }
-      const messageResponse = await response.json();
-      console.log(messageResponse.message);
-      console.log("Login successful");
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.log(error.response.data.message);
     }
     reset();
   }
+
+  // async function HandleLogin(data: TloginSignupSchema) {
+  //   try {
+  //     // Change url
+  //     const response = await fetch("http://localhost:3000/users/login", {
+  //       method: "POST",
+  //       headers: { "Content-type": "application/json" },
+  //       body: JSON.stringify(data),
+  //     });
+  //     if (!response.ok) {
+  //       throw new Error("Could not fetch response");
+  //     }
+  //     const messageResponse = await response.json();
+  //     console.log(messageResponse.message);
+  //     console.log("Login successful");
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  //   reset();
+  // }
 
   return (
     <main className="min-h-screen bg-background-color-main">

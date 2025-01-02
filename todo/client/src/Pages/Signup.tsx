@@ -4,6 +4,8 @@ import "../index.css";
 import { useForm } from "react-hook-form";
 import { TloginSignupSchema, ZsignupSchema } from "../../../lib/types";
 import NavigateAuthentication from "../Components/NavigateAuthentication";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
   // Setup Schema
@@ -16,26 +18,50 @@ export default function Signup() {
     resolver: zodResolver(ZsignupSchema),
   });
 
+  const navigateTo = useNavigate();
+
   // Handle Sign Up Submission to Server After Validation
   async function HandleSignup(data: TloginSignupSchema) {
     try {
-      // Change url
-      const response = await fetch("http://localhost:3000/users/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error("Could not fetch response");
+      const response = await axios.post(
+        "http://localhost:3000/users/signup",
+        data,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      console.log(response.data.message);
+
+      if (response.data.Status === "Success") {
+        // Navigate to Login Page After Account Creation
+        navigateTo("/login");
       }
-      const messageResponse = await response.json();
-      console.log(messageResponse.message);
-      console.log("Signup successful");
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.log(error.response.data.message);
     }
     reset();
   }
+
+  // async function HandleSignup(data: TloginSignupSchema) {
+  //   try {
+  //     // Change url
+  //     const response = await fetch("http://localhost:3000/users/signup", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(data),
+  //     });
+  //     if (!response.ok) {
+  //       throw new Error("Could not fetch response");
+  //     }
+  //     const messageResponse = await response.json();
+  //     console.log(messageResponse.message);
+  //     console.log("Signup successful");
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  //   reset();
+  // }
 
   return (
     <main className="min-h-screen bg-background-color-main">

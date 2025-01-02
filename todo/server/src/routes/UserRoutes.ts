@@ -3,13 +3,26 @@ import {
   ZloginSignupSchemaServer,
   ZsignupSchemaServer,
 } from "../../../lib/serverTypes";
-import { ZodError } from "zod";
+import { any, ZodError } from "zod";
 import { UserCollection } from "../main";
 import { validateData } from "../../../lib/middleware";
+// Import Libraries for Authentication and Authorization
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
+
 const router = express.Router();
+
+router.use(cookieParser());
 
 // console.log("HELLO FROM USER ROUTES");
 
+// PROTECTED GET ROUTE
+// router.use('/protected', verifyUser: any, (req: Request, res: Response) => {
+//   res.json("Success");
+// })
+
+// LOGIN POST ROUTE
 router.post(
   "/login",
   validateData(ZloginSignupSchemaServer) as any,
@@ -24,20 +37,36 @@ router.post(
       // Check if account with the entered email already exists
       const user = await UserCollection.findOne({ email });
 
-      // If account do not exist, return
-      if (!user) {
-        return res.status(404).json({ message: "User does not exist" });
-      }
-
-      // If account exists, check if password matches
-      if (user.password !== password) {
-        return res.status(401).json({ message: "Invalid email or password." });
+      if (password !== undefined) {
+        // If account exists, check if password matches
+        if (user) {
+          // Compare passwords
+          bcrypt.compare(password, user.password, (error, response) => {
+            // If password is correct
+            if (response) {
+              // Generate token - secret key must be at least 32 chars - expires in 1 day
+              const token = jwt.sign(
+                { email: user.email },
+                "jwt-test-secret-key",
+                { expiresIn: "1d" }
+              );
+              // Set Cookie
+              res.cookie("token", token);
+              return res.status(200).json({
+                Status: "Success",
+                message: "Account Successfully Logged In",
+              });
+            } else {
+              // Return if password is incorrect
+              return res.status(401).json({ message: "Password is incorrect" });
+            }
+          });
+        } else {
+          return res.status(404).json({ message: "User does not exist" });
+        }
       }
 
       console.log("Received data: ", { email, password });
-
-      // Permit entry
-      res.status(200).json({ message: "Account Successfully Logged In" });
     } catch (error) {
       if (error instanceof ZodError) {
         return res
@@ -45,12 +74,13 @@ router.post(
           .json({ error: "Account Login Failed", details: error.errors });
       } else {
         console.error("Unexpected error: ", error);
-        return res.sendStatus(500).json({ erorr: "Unexpected error" });
+        return res.status(500).json({ error: "Unexpected error" });
       }
     }
   }
 );
 
+// SIGNUP POST ROUTE
 router.post(
   "/signup",
   validateData(ZsignupSchemaServer) as any,
@@ -59,6 +89,8 @@ router.post(
       console.log("HELLO FROM SIGN UP ROUTE");
       // Get data from client
       const signupData = ZsignupSchemaServer.safeParse(req.body);
+
+      // Initialize properties for authentication purposes
       const email = signupData.data?.email;
       const password = signupData.data?.password;
 
@@ -68,13 +100,18 @@ router.post(
       // Prevent account creation if account already exists
       if (user) {
         return res.status(409).json({ message: "Account already exists." });
+      } else {
+        // If new record, hash password with 10x calculation then insert data to database
+        if (password !== undefined) {
+          const hashPassword = await bcrypt.hash(password, 10);
+          await UserCollection.insertOne({ email, password: hashPassword });
+          res.status(201).json({
+            Status: "Success",
+            message: "Account Successfully Created",
+          });
+          console.log("RETRIEVED: ", signupData.data, hashPassword);
+        }
       }
-
-      // If new record, insert data to database
-      await UserCollection.insertOne({ email, password });
-
-      console.log("RETRIEVED: ", signupData.data);
-      res.status(201).json({ message: "Account Successfully Created" });
     } catch (error) {
       if (error instanceof ZodError) {
         return res
@@ -82,7 +119,7 @@ router.post(
           .json({ error: "Account Creation Failed", details: error.errors });
       } else {
         console.error("Unexpected error: ", error);
-        return res.sendStatus(500).json({ error: "Unexpected error" });
+        return res.status(500).json({ error: "Unexpected error" });
       }
     }
   }
