@@ -25,7 +25,12 @@ export const ZnewTaskSchemaServer = z.object({
       },
       { message: "Task Deadline must be in the future" }
     ),
-  TaskDescription: z.string({
-    invalid_type_error: "Task Description must be a string",
-  }),
+  TaskDescription: z
+    .string({
+      invalid_type_error: "Task Description must be a string",
+    })
+    .optional()
+    .nullable(),
 });
+
+export const TImage = ["image/jpeg", "image/png", "image/gif"];

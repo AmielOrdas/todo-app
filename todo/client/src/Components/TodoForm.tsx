@@ -147,7 +147,7 @@ export default function TodoForm() {
           )}
         </h1>
         <input
-          type="date"
+          type="datetime-local"
           {...register("TaskDeadline")}
           className="w-[349px] h-[27px] bg-input-green"
         />
