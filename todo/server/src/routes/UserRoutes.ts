@@ -3,13 +3,16 @@ import {
   ZloginSignupSchemaServer,
   ZsignupSchemaServer,
 } from "../../../lib/serverTypes";
-import { any, ZodError } from "zod";
+import { ZodError } from "zod";
 import { UserCollection } from "../main";
 import { validateData } from "../../../lib/middleware";
 // Import Libraries for Authentication and Authorization
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+
+dotenv.config({ path: "../.env" });
 
 const router = express.Router();
 
@@ -44,17 +47,19 @@ router.post(
           bcrypt.compare(password, user.password, (error, response) => {
             // If password is correct
             if (response) {
-              // Generate token - secret key must be at least 32 chars - expires in 1 day
+              // Generate token - secret key must be at least 32 chars - expires in 1 hour
               const token = jwt.sign(
-                { email: user.email },
-                "jwt-test-secret-key",
-                { expiresIn: "1d" }
+                { _id: user._id, email: user.email },
+                process.env.JWT_SECRET || "",
+                { expiresIn: "1h" }
               );
               // Set Cookie
               res.cookie("token", token);
+              // Send Response with token
               return res.status(200).json({
                 Status: "Success",
                 message: "Account Successfully Logged In",
+                token: token,
               });
             } else {
               // Return if password is incorrect

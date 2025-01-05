@@ -33,10 +33,14 @@ export default function Login() {
           headers: { "Content-Type": "application/json" },
         }
       );
-      console.log(response.data.message);
+      // console.log(response.data.message);
 
       // Template for Varying Output from Server Response
       if (response.data.Status === "Success") {
+        // Get Token
+        const { token } = await response.data;
+        // Store token in Local Storage
+        localStorage.setItem("token", token);
         // Navigate to Todo Page After Account Login
         navigateTo("/");
       }

@@ -1,6 +1,8 @@
-import { parse } from "dotenv";
+import dotenv from "dotenv";
 import { Request, Response, NextFunction } from "express";
-// import jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+
+dotenv.config({ path: "../.env" });
 
 export function validateData(schema: any) {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -17,6 +19,32 @@ export function validateData(schema: any) {
     // Validation passed, continue to the next middleware/route handler
     next();
   };
+}
+
+// Middleware for Authentication
+export function authenticateUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  // Get token
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res
+      .status(401)
+      .json({ message: "Access denied. No token provided." });
+  }
+
+  try {
+    // Decode token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || "");
+    // Attach info to request
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(403).json({ message: "Invalid or token expired." });
+  }
 }
 
 // For Role Authorization
