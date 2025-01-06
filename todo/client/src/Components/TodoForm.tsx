@@ -21,62 +21,26 @@ export default function TodoForm() {
   const fileRef = useRef<TTaskImage>(undefined);
   const taskImage: TTaskImage = watch("TaskImage");
 
-  // useEffect(() => {
-  //   console.log("Hello");
-  //   if (taskImage instanceof FileList && taskImage.length > 0) {
-  //     console.log("taskImage", taskImage);
-  //     fileRef.current = taskImage;
-
-  //     console.log("fileRefUseEffect", fileRef.current);
-  //   } else if (taskImage instanceof File) {
-  //     fileRef.current = taskImage;
-  //   }
-  // }, [taskImage]);
-
-  // function handleFileUpload(e: ChangeEvent<HTMLInputElement>) {
-  //   const file = e.target.files?.[0];
-  //   if (file) {
-  //     if (!TImage.includes(file.type)) {
-  //       alert("Please upload a valid image file (JPEG, PNG, GIF).");
-  //       // alert(errors.TaskImage?.message);
-  //       // console.log(typeof file.type);
-  //       // watch("TaskImage");
-  //       setFileName("No File Chosen");
-  //       // setValue("TaskImage", {});
-  //     } else {
-  //       // console.log("hello", file);
-  //       setFileName(file.name);
-  //       // setValue("TaskImage", file);
-
-  //       // console.log("Current value of TaskImage", watch("TaskImage"));
-  //     }
-  //   }
-  // }
-
-  // function handleFileUploadRef() {
-  //   const file = fileInputRef.current?.files[0];
-  //   if (file) {
-  //     if (TImage.includes(file.type)) {
-  //       console.log("File name:", file.name);
-  //       console.log("File Type", file);
-  //     } else {
-  //       console.log("No file chosen");
-  //     }
-  //   }
-  // }
-
-  // function getFileName(e: ChangeEvent<HTMLInputElement>) {
-  //   if (!errors.TaskImage) {
-  //     setFileName(e.target.value);
-  //   }
-  // }
-
   async function SubmitData(data: TnewTaskSchemaClient) {
+    const formData = new FormData();
+    formData.append("TaskName", data.TaskName);
+    formData.append("TaskDeadline", data.TaskDeadline);
+    formData.append("TaskDescription", data.TaskDescription);
+
+    // if (data.TaskImage && (data.TaskImage[0] as File)) {
+    //   formData.append("TaskImage", data.TaskImage[0]);
+    // }
+
+    if (data.TaskImage instanceof File) {
+      formData.append("TaskImage", data.TaskImage);
+    } else if (data.TaskImage instanceof FileList) {
+      formData.append("TaskImage", data.TaskImage[0]);
+    }
+
     try {
       const response = await fetch("http://localhost:3000/tasks", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: formData,
       }); // Fetch API will return a promise object that contains the HTTP response.
       if (!response.ok) {
         throw new Error("Could not fetch response"); // This will execute when fetching fails
@@ -85,7 +49,7 @@ export default function TodoForm() {
     } catch (error) {
       console.error(error);
     }
-    console.log("Submitted!");
+
     reset();
   }
   // console.log("fileRef: ", fileRef.current);
@@ -106,8 +70,6 @@ export default function TodoForm() {
       }
     } else if (value instanceof File) {
       const file: File = value;
-      // setValue("TaskImage", file);
-      // return file ? file.name : "No file chosen";
       return file.name;
     } else if (!value) {
       return "No file chosen";
@@ -160,15 +122,6 @@ export default function TodoForm() {
           className="w-[348.83px] h-[154.45px] bg-input-green placeholder:italic placeholder:text-slate-500"
         />
       </div>
-      {/* <div className=" w-[190px] ml-[37px] text-left text-xs">
-        {errors.TaskImage ? (
-          <p className="text-red-600">{errors.TaskImage.message}</p>
-        ) : taskImage?.length > 0 ? (
-          <p>{taskImage[0].name}</p>
-        ) : (
-          <p>No File Chosen</p>
-        )}
-      </div> */}
 
       <div className="w-[190px] ml-[37px] text-left text-xs">
         {errors.TaskImage ? (
