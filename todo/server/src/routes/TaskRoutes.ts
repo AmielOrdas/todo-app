@@ -3,7 +3,7 @@ import { ZnewTaskSchemaServer, TImage } from "../../../lib/serverTypes";
 import { parse } from "dotenv";
 import { ZodError } from "zod";
 import { connectMongoAtlas } from "../database/db";
-import { validateTask } from "../../../lib/middleware";
+import { validateData } from "../../../lib/middleware";
 import multer from "multer";
 import { getDBVariables } from "../database/db";
 
@@ -16,7 +16,7 @@ const upload = multer({ storage: assets });
 router.post(
   "/",
   upload.single("TaskImage"),
-  validateTask(ZnewTaskSchemaServer) as any,
+  validateData(ZnewTaskSchemaServer) as any,
   async (req: Request, res: Response) => {
     await connectMongoAtlas();
     const { TaskCollection } = getDBVariables();

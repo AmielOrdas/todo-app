@@ -1,8 +1,5 @@
 import express, { Request, Response } from "express";
-import {
-  ZloginSignupSchemaServer,
-  ZsignupSchemaServer,
-} from "../../../lib/serverTypes";
+import { ZloginSignupSchemaServer, ZsignupSchemaServer } from "../../../lib/serverTypes";
 import { ZodError } from "zod";
 import { UserCollection } from "../main";
 import { validateData } from "../../../lib/middleware";
