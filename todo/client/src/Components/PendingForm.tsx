@@ -30,8 +30,7 @@ export default function PendingForm({
   const [editedDeadline, setEditedDeadline] = useState(
     taskDeadline.toISOString().slice(0, 16)
   ); // Datetime-local input
-  const [editedTaskDescription, setEditedTaskDescription] =
-    useState(taskDescription);
+  const [editedTaskDescription, setEditedTaskDescription] = useState(taskDescription);
 
   // Function to handle updating
   const handleSaveEdit = () => {
@@ -54,9 +53,7 @@ export default function PendingForm({
         ? `0${taskDeadline.getMonth() + 1}`
         : taskDeadline.getMonth() + 1
     }-${
-      taskDeadline.getDate() < 10
-        ? `0${taskDeadline.getDate()}`
-        : taskDeadline.getDate()
+      taskDeadline.getDate() < 10 ? `0${taskDeadline.getDate()}` : taskDeadline.getDate()
     }\n${
       taskDeadline.getHours() < 10 && taskDeadline.getHours() !== 0
         ? `0${taskDeadline.getHours()}`

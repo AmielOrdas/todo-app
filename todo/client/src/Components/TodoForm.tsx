@@ -22,11 +22,25 @@ export default function TodoForm() {
   const taskImage: TTaskImage = watch("TaskImage");
 
   async function SubmitData(data: TnewTaskSchemaClient) {
+    const formData = new FormData();
+    formData.append("TaskName", data.TaskName);
+    formData.append("TaskDeadline", data.TaskDeadline);
+    formData.append("TaskDescription", data.TaskDescription);
+
+    // if (data.TaskImage && (data.TaskImage[0] as File)) {
+    //   formData.append("TaskImage", data.TaskImage[0]);
+    // }
+
+    if (data.TaskImage instanceof File) {
+      formData.append("TaskImage", data.TaskImage);
+    } else if (data.TaskImage instanceof FileList) {
+      formData.append("TaskImage", data.TaskImage[0]);
+    }
+
     try {
       const response = await fetch("http://localhost:3000/tasks", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: formData,
       }); // Fetch API will return a promise object that contains the HTTP response.
       if (!response.ok) {
         throw new Error("Could not fetch response"); // This will execute when fetching fails
@@ -35,7 +49,7 @@ export default function TodoForm() {
     } catch (error) {
       console.error(error);
     }
-    console.log("Submitted!");
+
     reset();
   }
 
@@ -93,7 +107,7 @@ export default function TodoForm() {
           )}
         </h1>
         <input
-          type="date"
+          type="datetime-local"
           {...register("TaskDeadline")}
           className="w-[349px] h-[27px] bg-input-green"
         />
