@@ -2,8 +2,24 @@ import { z } from "zod";
 import { Collection } from "mongodb";
 
 export const ZloginSignupSchema = z.object({
-  email: z.string().email("Enter a valid email address!"),
-  password: z.string().min(8, "Password must be at least 8 characters!"),
+  email: z
+    .string()
+    .email("Enter a valid email address!")
+    .refine(
+      (value) => value.endsWith("@gmail.com") || value.endsWith("@yahoo.com"),
+      {
+        message: "Email must be a gmail or yahoo account",
+      }
+    ),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters!")
+    .refine((value) => /[A-Z]/.test(value), {
+      message: "Password must contain at least one uppercase letter",
+    })
+    .refine((value) => /[0-9]/.test(value), {
+      message: "Password must contain at least one number",
+    }),
   confirmPassword: z.string().optional(),
 });
 

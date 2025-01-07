@@ -13,6 +13,7 @@ export default function Login() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    setError,
     reset,
   } = useForm<TloginSignupSchema>({
     resolver: zodResolver(ZloginSignupSchema),
@@ -26,9 +27,13 @@ export default function Login() {
   // Handle Login Submission to Server
   async function HandleLogin(data: TloginSignupSchema) {
     try {
-      const response = await axios.post("http://localhost:3000/users/login", data, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await axios.post(
+        "http://localhost:3000/users/login",
+        data,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       // console.log(response.data.message);
 
       // Template for Varying Output from Server Response
@@ -41,11 +46,10 @@ export default function Login() {
         navigateTo("/Todo");
       }
     } catch (error: any) {
-      if (error.response.status === 401) {
-        console.error("Incorrect email or password");
-      } else {
-        console.error(error.response.data.message);
-      }
+      // if (axios.isAxiosError(error) && error.response) {
+      //   const status:Number = error.response.status;
+      //   const serverErrorMessage = error.response.data.message;
+      // }
     }
     reset();
   }
@@ -81,31 +85,45 @@ export default function Login() {
       </div>
       <div className="mt-8">
         <div className="min-h-auto max-w-[421px] bg-form-color rounded-form-radius mx-auto my-auto border-black border-2">
-          <h1 className="text-center pt-2 text-2xl font-semibold">Login Account</h1>
+          <h1 className="text-center pt-2 text-2xl font-semibold">
+            Login Account
+          </h1>
           <form onSubmit={handleSubmit(HandleLogin)}>
             <div className="m-4">
-              <h1 className="text-lg">Email:</h1>
+              <h1 className="text-lg">
+                Email
+                {errors.email && (
+                  <label className="text-red-600 italic text-sm">{` (${errors.email.message})`}</label>
+                )}
+              </h1>
               <input
                 {...register("email")}
-                className="text-lg bg-input-green w-full rounded"
+                className={
+                  !errors.email
+                    ? "text-lg bg-input-green w-full rounded placeholder:italic placeholder:text-slate-500"
+                    : "text-lg bg-input-green w-full rounded placeholder:italic placeholder:text-red-500"
+                }
                 type="email"
                 placeholder="  Enter email"
               />
-              {errors.email && (
-                <p className="text-red-500">{`${errors.email.message}`}</p>
-              )}
             </div>
             <div className="m-4">
-              <h1 className="text-lg">Password:</h1>
+              <h1 className="text-lg">
+                Password
+                {errors.password && (
+                  <label className="text-red-600 italic text-sm">{` (${errors.password.message})`}</label>
+                )}
+              </h1>
               <input
                 {...register("password")}
-                className="text-lg bg-input-green w-full rounded"
+                className={
+                  !errors.password
+                    ? "text-lg bg-input-green w-full rounded placeholder:italic placeholder:text-slate-500"
+                    : "text-lg bg-input-green w-full rounded placeholder:italic placeholder:text-red-500"
+                }
                 type="password"
                 placeholder="  Enter password"
               />
-              {errors.password && (
-                <p className="text-red-500">{`${errors.password.message}`}</p>
-              )}
             </div>
             <div className="flex justify-around pt-2 pb-6">
               <button
