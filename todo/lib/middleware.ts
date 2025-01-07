@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { ObjectId } from "mongodb";
 
 dotenv.config({ path: "../.env" });
 
@@ -22,30 +23,32 @@ export function validateData(schema: any) {
 }
 
 // Middleware for Authentication
-export function authenticateUser(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  // Get token
-  const token = req.headers.authorization?.split(" ")[1];
+export const authenticateUser = (req: Request, res: Response, next: NextFunction) => {
+  // Get token when token is in authorization header
+  // const token = req.headers.authorization?.split(" ")[1];
 
+  // Get token in cookies
+  const token = req.cookies?.token;
   if (!token) {
-    return res
-      .status(401)
-      .json({ message: "Access denied. No token provided." });
+    res.status(401).json({ message: "Access denied. No token provided." });
+    return;
   }
 
   try {
     // Decode token
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || "");
     // Attach info to request
-    req.user = decoded;
-    next();
+
+    if (typeof decoded === "object" && "_id" in decoded && "email" in decoded) {
+      req.user = decoded as { _id: string; email: string };
+      next();
+    } else {
+      return;
+    }
   } catch (error) {
     res.status(403).json({ message: "Invalid or token expired." });
   }
-}
+};
 
 // For Role Authorization
 // export function verifyUser(req: Request, res: Response, next: NextFunction) {

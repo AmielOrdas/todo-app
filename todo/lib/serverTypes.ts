@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Collection } from "mongodb";
+import { Collection, ObjectId } from "mongodb";
 
 export const ZnewTaskSchemaServer = z.object({
   TaskName: z
@@ -48,3 +48,11 @@ export const ZsignupSchemaServer = ZloginSignupSchemaServer.refine(
 );
 
 export const TImage = ["image/jpeg", "image/png", "image/gif"];
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: { _id: string; email: string };
+    }
+  }
+}

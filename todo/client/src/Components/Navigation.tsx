@@ -7,7 +7,7 @@ export default function Navigation() {
         <img src={logo} className="xl:ml-[150px] lg:size-20 sm:size-40" />
         <ul className="lg:flex justify-between items-center">
           <li className="hover:bg-[#441D1D] text-[24px] text-nav-bar-font-color px-8 max-lg: py-1 hover:font-bold">
-            <Link to="/">Todo</Link>
+            <Link to="/Todo">Todo</Link>
           </li>
           <li className="hover:bg-[#441D1D] text-[24px] text-nav-bar-font-color px-8 max-lg: py-1 hover:font-bold">
             <Link to="/pending-tasks">Task Pending List</Link>

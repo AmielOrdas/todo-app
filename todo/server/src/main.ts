@@ -4,7 +4,7 @@ import UserRoutes from "./routes/UserRoutes";
 import cors from "cors";
 import { connectMongoAtlas, getDBVariables } from "./database/db";
 import { MongoClient } from "mongodb";
-
+import cookieParser from "cookie-parser";
 const app = express();
 const PORT = 3000;
 
@@ -16,6 +16,8 @@ app.use(
   })
 );
 app.use(express.json());
+
+app.use(cookieParser());
 
 (async () => {
   try {

@@ -7,6 +7,8 @@ import {
   TTaskImage,
 } from "../../../lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+
 export default function TodoForm() {
   const {
     register,
@@ -27,10 +29,6 @@ export default function TodoForm() {
     formData.append("TaskDeadline", data.TaskDeadline);
     formData.append("TaskDescription", data.TaskDescription);
 
-    // if (data.TaskImage && (data.TaskImage[0] as File)) {
-    //   formData.append("TaskImage", data.TaskImage[0]);
-    // }
-
     if (data.TaskImage instanceof File) {
       formData.append("TaskImage", data.TaskImage);
     } else if (data.TaskImage instanceof FileList) {
@@ -38,19 +36,29 @@ export default function TodoForm() {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/tasks", {
-        method: "POST",
-        body: formData,
-      }); // Fetch API will return a promise object that contains the HTTP response.
-      if (!response.ok) {
-        throw new Error("Could not fetch response"); // This will execute when fetching fails
-      }
-      const messageResponse = await response.json(); // This will convert the body of the HTTP response from JSON to a JavaScript object.
-    } catch (error) {
-      console.error(error);
+      const response = await axios.post("http://localhost:3000/tasks", formData, {
+        withCredentials: true,
+      });
+    } catch (error: any) {
+      console.error(error.response.data.message);
     }
 
     reset();
+
+    // try {
+    //   const response = await fetch("http://localhost:3000/tasks", {
+    //     method: "POST",
+    //     body: formData,
+    //   }); // Fetch API will return a promise object that contains the HTTP response.
+    //   if (!response.ok) {
+    //     throw new Error("Could not fetch response"); // This will execute when fetching fails
+    //   }
+    //   const messageResponse = await response.json(); // This will convert the body of the HTTP response from JSON to a JavaScript object.
+    // } catch (error) {
+    //   console.error(error);
+    // }
+
+    // reset();
   }
 
   function CheckFileInput(value: TTaskImage) {

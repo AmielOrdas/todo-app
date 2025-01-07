@@ -26,26 +26,26 @@ export default function Login() {
   // Handle Login Submission to Server
   async function HandleLogin(data: TloginSignupSchema) {
     try {
-      const response = await axios.post(
-        "http://localhost:3000/users/login",
-        data,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const response = await axios.post("http://localhost:3000/users/login", data, {
+        headers: { "Content-Type": "application/json" },
+      });
       // console.log(response.data.message);
 
       // Template for Varying Output from Server Response
       if (response.data.Status === "Success") {
         // Get Token
-        const { token } = await response.data;
-        // Store token in Local Storage
-        localStorage.setItem("token", token);
-        // Navigate to Todo Page After Account Login
-        navigateTo("/");
+        // const { token } = await response.data;
+        // // Store token in Local Storage
+        // localStorage.setItem("token", token);
+        // // Navigate to Todo Page After Account Login
+        navigateTo("/Todo");
       }
     } catch (error: any) {
-      console.log(error.response.data.message);
+      if (error.response.status === 401) {
+        console.error("Incorrect email or password");
+      } else {
+        console.error(error.response.data.message);
+      }
     }
     reset();
   }
@@ -81,9 +81,7 @@ export default function Login() {
       </div>
       <div className="mt-8">
         <div className="min-h-auto max-w-[421px] bg-form-color rounded-form-radius mx-auto my-auto border-black border-2">
-          <h1 className="text-center pt-2 text-2xl font-semibold">
-            Login Account
-          </h1>
+          <h1 className="text-center pt-2 text-2xl font-semibold">Login Account</h1>
           <form onSubmit={handleSubmit(HandleLogin)}>
             <div className="m-4">
               <h1 className="text-lg">Email:</h1>

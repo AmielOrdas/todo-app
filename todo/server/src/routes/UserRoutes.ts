@@ -6,14 +6,11 @@ import { validateData } from "../../../lib/middleware";
 // Import Libraries for Authentication and Authorization
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 
 dotenv.config({ path: "../.env" });
 
 const router = express.Router();
-
-router.use(cookieParser());
 
 // console.log("HELLO FROM USER ROUTES");
 
@@ -25,7 +22,7 @@ router.use(cookieParser());
 // LOGIN POST ROUTE
 router.post(
   "/login",
-  validateData(ZloginSignupSchemaServer) as any,
+  validateData(ZloginSignupSchemaServer),
   async (req: Request, res: Response) => {
     try {
       // Get Input from Client
@@ -47,12 +44,13 @@ router.post(
               // Generate token - secret key must be at least 32 chars - expires in 1 hour
               const token = jwt.sign(
                 { _id: user._id, email: user.email },
-                process.env.JWT_SECRET || "",
+                process.env.JWT_SECRET_KEY || "",
                 { expiresIn: "1h" }
               );
               // Set Cookie
               res.cookie("token", token);
               // Send Response with token
+
               return res.status(200).json({
                 Status: "Success",
                 message: "Account Successfully Logged In",
@@ -85,7 +83,7 @@ router.post(
 // SIGNUP POST ROUTE
 router.post(
   "/signup",
-  validateData(ZsignupSchemaServer) as any,
+  validateData(ZsignupSchemaServer),
   async (req: Request, res: Response) => {
     try {
       console.log("HELLO FROM SIGN UP ROUTE");
@@ -103,7 +101,7 @@ router.post(
       if (user) {
         return res.status(409).json({ message: "Account already exists." });
       } else {
-        // If new record, hash password with 10x calculation then insert data to database
+        // If new record, hash password with 10x hashing rounds then insert data to database
         if (password !== undefined) {
           const hashPassword = await bcrypt.hash(password, 10);
           await UserCollection.insertOne({ email, password: hashPassword });
