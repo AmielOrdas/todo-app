@@ -42,16 +42,31 @@ export default function Login() {
         // const { token } = await response.data;
         // // Store token in Local Storage
         // localStorage.setItem("token", token);
+        // Reset
+        reset();
         // // Navigate to Todo Page After Account Login
         navigateTo("/Todo");
       }
     } catch (error: any) {
-      // if (axios.isAxiosError(error) && error.response) {
-      //   const status:Number = error.response.status;
-      //   const serverErrorMessage = error.response.data.message;
-      // }
+      if (axios.isAxiosError(error) && error.response) {
+        // Get Status and Error Response
+        const status: number = error.response.status;
+        const serverErrorMessage: string = error.response.data.error;
+        console.log(status);
+        console.log(serverErrorMessage);
+        // Set Whichever Error Received from Server
+        if (status === 404) {
+          setError("email", { type: "server", message: serverErrorMessage });
+        } else if (status === 401) {
+          setError("password", { type: "server", message: serverErrorMessage });
+        } else {
+          setError("root", {
+            type: "server",
+            message: "Unexpected error occurred",
+          });
+        }
+      }
     }
-    reset();
   }
 
   // async function HandleLogin(data: TloginSignupSchema) {

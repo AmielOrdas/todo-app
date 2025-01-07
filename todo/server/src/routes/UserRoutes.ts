@@ -1,5 +1,8 @@
 import express, { Request, Response } from "express";
-import { ZloginSignupSchemaServer, ZsignupSchemaServer } from "../../../lib/serverTypes";
+import {
+  ZloginSignupSchemaServer,
+  ZsignupSchemaServer,
+} from "../../../lib/serverTypes";
 import { ZodError } from "zod";
 import { UserCollection } from "../main";
 import { validateData } from "../../../lib/middleware";
@@ -48,21 +51,25 @@ router.post(
                 { expiresIn: "1h" }
               );
               // Set Cookie
-              res.cookie("token", token);
-              // Send Response with token
-
+              res.cookie("token", token, {
+                httpOnly: true,
+                secure: false,
+                sameSite: "strict",
+                path: "/", // Explicit path
+                maxAge: 3600000, // 1 hour
+              });
+              // Send Response
               return res.status(200).json({
                 Status: "Success",
                 message: "Account Successfully Logged In",
-                token: token,
               });
             } else {
               // Return if password is incorrect
-              return res.status(401).json({ message: "Password is incorrect" });
+              return res.status(401).json({ error: "Password is incorrect" });
             }
           });
         } else {
-          return res.status(404).json({ message: "User does not exist" });
+          return res.status(404).json({ error: "User does not exist" });
         }
       }
 
@@ -70,7 +77,7 @@ router.post(
     } catch (error) {
       if (error instanceof ZodError) {
         return res
-          .sendStatus(401)
+          .status(401)
           .json({ error: "Account Login Failed", details: error.errors });
       } else {
         console.error("Unexpected error: ", error);
@@ -99,7 +106,7 @@ router.post(
 
       // Prevent account creation if account already exists
       if (user) {
-        return res.status(409).json({ message: "Account already exists." });
+        return res.status(409).json({ error: "Account already exists." });
       } else {
         // If new record, hash password with 10x hashing rounds then insert data to database
         if (password !== undefined) {
@@ -125,13 +132,19 @@ router.post(
   }
 );
 
-// router.post("/test", async (req: Request, res: Response) => {
-//   console.log("data: ", req.body);
-//   return res.send({ message: "HELLO FROM POST" });
-// });
-
-// router.Statusget("/mama", (req: Request, res: Response) => {
-//   return res.send({ message: "HELLO FROM GET" });
-// });
+// SIGN OUT ROUTE
+router.post("/signout", async (req: Request, res: Response) => {
+  try {
+    // Clear Cookie Once Signed Out
+    res.clearCookie("token", {
+      path: "/", // Explicit path to match
+    });
+    res.send({ message: "Successfully Signed out" });
+    console.log("Signout");
+  } catch (error) {
+    console.error("Unexpected error: ", error);
+    return res.status(500).json({ error: "Unexpected error" });
+  }
+});
 
 export default router;
