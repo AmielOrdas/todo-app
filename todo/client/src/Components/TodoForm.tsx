@@ -19,7 +19,9 @@ export default function TodoForm() {
     setValue,
     watch,
     trigger,
-  } = useForm<TnewTaskSchemaClient>({ resolver: zodResolver(ZnewTaskSchemaClient) });
+  } = useForm<TnewTaskSchemaClient>({
+    resolver: zodResolver(ZnewTaskSchemaClient),
+  });
   const fileRef = useRef<TTaskImage>(undefined);
   const taskImage: TTaskImage = watch("TaskImage");
 
@@ -36,9 +38,13 @@ export default function TodoForm() {
     }
 
     try {
-      const response = await axios.post("http://localhost:3000/tasks", formData, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        "http://localhost:3000/tasks",
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
     } catch (error: any) {
       console.error(error.response.data.message);
     }
@@ -125,7 +131,7 @@ export default function TodoForm() {
         <textarea
           {...register("TaskDescription")}
           placeholder="Enter Task Description"
-          className="w-[348.83px] h-[154.45px] bg-input-green placeholder:italic placeholder:text-slate-500"
+          className="w-[348.83px] h-[154.45px] bg-input-green placeholder:italic placeholder:text-slate-500 resize-none"
         />
       </div>
 
@@ -149,7 +155,7 @@ export default function TodoForm() {
           type="submit"
           className="text-[12px] bg-button-red w-[64px] h-[25.08px]  disabled:opacity-75"
         >
-          Submit {`${isSubmitting}`}
+          Submit {/*`${isSubmitting}`*/}
         </button>
       </div>
     </form>

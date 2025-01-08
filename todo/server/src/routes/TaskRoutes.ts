@@ -2,10 +2,10 @@ import express, { Request, Response } from "express";
 import { ZnewTaskSchemaServer, TImage } from "../../../lib/serverTypes";
 import { parse } from "dotenv";
 import { ZodError } from "zod";
-import { connectMongoAtlas } from "../database/db";
 import { validateData, authenticateUser } from "../../../lib/middleware";
 import multer from "multer";
-import { getDBVariables } from "../database/db";
+import { connectMongoAtlas, getDBVariables } from "../database/db";
+import { ObjectId } from "mongodb";
 
 const router = express.Router();
 
@@ -49,9 +49,38 @@ router.post(
   }
 );
 
-router.get("/pending", (req: Request, res: Response) => {
-  res.send({ message: "Hello from get all forms" });
-});
+router.get(
+  "/pending",
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    try {
+      // Connect to Database
+      await connectMongoAtlas();
+      // Get TaskCollection
+      const { TaskCollection } = getDBVariables();
+      // Get userID from cookie's token
+      const userID = req.user?._id;
+      // Fetch all pending tasks from database using userID as key - Convert Cursor to Array
+      const pendingTasks = await TaskCollection.find({
+        userID,
+        isPending: true,
+      }).toArray();
+      console.log(userID);
+      if (pendingTasks.length === 0) {
+        return res
+          .status(404)
+          .json({ pendingTasks: [], message: "User has no pending tasks" });
+      } else {
+        return res.status(200).json({
+          pendingTasks,
+          message: "Successfully fetched pending tasks",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+);
 
 router.get("/finished", (req: Request, res: Response) => {
   res.send({ message: "Hello from get all forms" });
@@ -64,13 +93,68 @@ router
       message: `Hello from get specific form with an ID of ${req.params.id}`,
     });
   })
-  .put((req: Request, res: Response) => {
-    res.send({
-      message: `Hello from edit specific form with an ID of ${req.params.id} `,
-    });
+  .put(authenticateUser, async (req: Request, res: Response) => {
+    // Retrieve ID and Key/Value Pairs
+    const { id } = req.params;
+    const { TaskName, TaskDeadline, TaskDescription } = req.body;
+    // Retrieve User ID from cookie
+    const userID = req.user?._id;
+
+    try {
+      // Connect to Database
+      await connectMongoAtlas();
+      // Get TaskCollection
+      const { TaskCollection } = getDBVariables();
+
+      // Update Task
+      const result = await TaskCollection.updateOne(
+        { _id: new ObjectId(id), userID },
+        {
+          $set: {
+            name: TaskName,
+            deadline: TaskDeadline,
+            description: TaskDescription,
+          },
+        }
+      );
+
+      // Check if task has found in database
+      if (result.matchedCount === 0) {
+        return res
+          .status(404)
+          .json({ message: "Task not found in the database or Unauthorized" });
+      }
+      return res.status(200).json({ message: "Task updated successfully" });
+    } catch (error) {
+      console.error(error);
+    }
   })
-  .delete((req: Request, res: Response) => {
-    res.send({ message: `Delete form with ID ${req.params.id}` });
+  .delete(authenticateUser, async (req: Request, res: Response) => {
+    // Retrieve Task ID
+    const { id } = req.params;
+    // Retrieve User ID from cookie
+    const userID = req.user?._id;
+    try {
+      // Connect to Database
+      await connectMongoAtlas();
+      // Get TaskCollection
+      const { TaskCollection } = getDBVariables();
+
+      // Delete the task using its id and userID
+      const result = await TaskCollection.deleteOne({
+        _id: new ObjectId(id),
+        userID,
+      });
+      // Check if a task has been deleted
+      if (result.deletedCount === 0) {
+        return res
+          .status(404)
+          .json({ message: "Task not found in the database or Unauthorized" });
+      }
+      return res.status(200).json({ message: "Task deleted successfully" });
+    } catch (error) {
+      console.error(error);
+    }
   });
 
 export default router;

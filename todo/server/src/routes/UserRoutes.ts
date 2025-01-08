@@ -4,7 +4,7 @@ import {
   ZsignupSchemaServer,
 } from "../../../lib/serverTypes";
 import { ZodError } from "zod";
-import { UserCollection } from "../main";
+import { connectMongoAtlas, getDBVariables } from "../database/db";
 import { validateData } from "../../../lib/middleware";
 // Import Libraries for Authentication and Authorization
 import bcrypt from "bcrypt";
@@ -17,20 +17,19 @@ const router = express.Router();
 
 // console.log("HELLO FROM USER ROUTES");
 
-// PROTECTED GET ROUTE
-// router.use('/protected', verifyUser: any, (req: Request, res: Response) => {
-//   res.json("Success");
-// })
-
 // LOGIN POST ROUTE
 router.post(
   "/login",
   validateData(ZloginSignupSchemaServer),
   async (req: Request, res: Response) => {
     try {
+      // Connect to Database
+      await connectMongoAtlas();
+      // Get UserCollection
+      const { UserCollection } = getDBVariables();
       // Get Input from Client
       const loginData = ZloginSignupSchemaServer.safeParse(req.body);
-
+      // Initialize properties for authentication purposes
       const email = loginData.data?.email;
       const password = loginData.data?.password;
 
@@ -72,7 +71,6 @@ router.post(
           return res.status(404).json({ error: "User does not exist" });
         }
       }
-
       console.log("Received data: ", { email, password });
     } catch (error) {
       if (error instanceof ZodError) {
@@ -93,10 +91,13 @@ router.post(
   validateData(ZsignupSchemaServer),
   async (req: Request, res: Response) => {
     try {
-      console.log("HELLO FROM SIGN UP ROUTE");
+      // console.log("HELLO FROM SIGN UP ROUTE");
+      // Connect to Database
+      await connectMongoAtlas();
+      // Get UserCollection
+      const { UserCollection } = getDBVariables();
       // Get data from client
       const signupData = ZsignupSchemaServer.safeParse(req.body);
-
       // Initialize properties for authentication purposes
       const email = signupData.data?.email;
       const password = signupData.data?.password;

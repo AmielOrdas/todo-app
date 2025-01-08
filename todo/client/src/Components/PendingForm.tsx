@@ -1,44 +1,79 @@
 import { useState } from "react";
-import { TpendingTaskProps } from "../../../lib/types";
+import { TmodifiedTaskPendingProps } from "../../../lib/types";
 
 // Remove "Edit" Button for Finished Tasks and Add "Delete" Button
 
-type TmodifiedTaskPendingProps = TpendingTaskProps & {
-  onEdit?: (
-    id: number,
-    newTaskName: string,
-    newTaskDeadline: Date,
-    newTaskDescription: string
-  ) => void;
-  onDone?: (id: number) => void;
-  onDelete?: (id: number) => void;
-};
+// type TmodifiedTaskPendingProps = TpendingTaskProps & {
+//   onEdit?: (
+//     id: number,
+//     newTaskName: string,
+//     newTaskDeadline: Date,
+//     newTaskDescription: string
+//   ) => void;
+//   onDone?: (id: number) => void;
+//   onDelete?: (id: number) => void;
+// };
 
 export default function PendingForm({
-  id,
-  taskImage,
-  taskName,
-  taskDeadline,
-  taskDescription,
+  _id,
+  TaskName,
+  TaskDeadline,
+  TaskDescription,
+  ImageData,
   onEdit,
   onDone,
   onDelete,
 }: TmodifiedTaskPendingProps) {
   // Use Stateful Variables for Editing
   const [isEditing, setIsEditing] = useState(false);
-  const [editedTaskName, setEditedTaskName] = useState(taskName);
+  const [editedTaskName, setEditedTaskName] = useState(TaskName);
   const [editedDeadline, setEditedDeadline] = useState(
-    taskDeadline.toISOString().slice(0, 16)
+    TaskDeadline.toISOString().slice(0, 16)
   ); // Datetime-local input
-  const [editedTaskDescription, setEditedTaskDescription] = useState(taskDescription);
+  const [editedTaskDescription, setEditedTaskDescription] =
+    useState(TaskDescription);
 
-  // Function to handle updating
-  const handleSaveEdit = () => {
-    if (onEdit) {
-      const newTaskDeadline = new Date(editedDeadline);
-      onEdit(id, editedTaskName, newTaskDeadline, editedTaskDescription);
+  // Function to Save and Update Task
+  const HandleSaveUpdateTask = async (
+    _id: string,
+    editedTaskName: string,
+    editedDeadline: string,
+    editedTaskDescription: string
+  ) => {
+    try {
+      // Update from Client
+      if (onEdit) {
+        const newTaskDeadline = new Date(editedDeadline);
+        onEdit(_id, editedTaskName, newTaskDeadline, editedTaskDescription);
+      }
+      // console.log("_id:", _id);
+      // console.log("editedTaskName:", editedTaskName);
+      // console.log("editedDeadline:", editedDeadline);
+      // console.log("editedTaskDescription:", editedTaskDescription);
+
+      // Pass _id and other updated task properties
+      const response = await fetch(`http://localhost:3000/tasks/${_id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          TaskName: editedTaskName,
+          TaskDeadline: editedDeadline,
+          TaskDescription: editedTaskDescription,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update task");
+      }
+
+      const result = await response.json();
+      console.log(result.message);
+
+      setIsEditing(false);
+    } catch (error) {
+      console.error(error);
     }
-    setIsEditing(false);
   };
 
   // Function to Cancel Editing
@@ -46,27 +81,54 @@ export default function PendingForm({
     setIsEditing(false);
   };
 
+  // Function to Delete a Task
+  const HandleDeleteTask = async (_id: string) => {
+    try {
+      // Fetch from Delete Route Using a Task Component's ID to Delete Task from Database
+      const response = await fetch(`http://localhost:3000/tasks/${_id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete task");
+      }
+      const result = await response.json();
+      console.log(result.message);
+      // Also Delete Task from Client
+      if (onDelete) {
+        onDelete(_id);
+        console.log("Deleted task from client successfully");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   // Format Date
-  function formatDate(taskDeadline: Date) {
-    return `Due: ${taskDeadline.getFullYear()}-${
-      taskDeadline.getMonth() < 9
-        ? `0${taskDeadline.getMonth() + 1}`
-        : taskDeadline.getMonth() + 1
+  function formatDate(TaskDeadline: Date) {
+    return `Due: ${TaskDeadline.getFullYear()}-${
+      TaskDeadline.getMonth() < 9
+        ? `0${TaskDeadline.getMonth() + 1}`
+        : TaskDeadline.getMonth() + 1
     }-${
-      taskDeadline.getDate() < 10 ? `0${taskDeadline.getDate()}` : taskDeadline.getDate()
+      TaskDeadline.getDate() < 10
+        ? `0${TaskDeadline.getDate()}`
+        : TaskDeadline.getDate()
     }\n${
-      taskDeadline.getHours() < 10 && taskDeadline.getHours() !== 0
-        ? `0${taskDeadline.getHours()}`
-        : taskDeadline.getHours() > 12
-        ? taskDeadline.getHours() % 12 < 10
-          ? `0${taskDeadline.getHours() % 12}`
-          : taskDeadline.getHours() % 12
+      TaskDeadline.getHours() < 10 && TaskDeadline.getHours() !== 0
+        ? `0${TaskDeadline.getHours()}`
+        : TaskDeadline.getHours() > 12
+        ? TaskDeadline.getHours() % 12 < 10
+          ? `0${TaskDeadline.getHours() % 12}`
+          : TaskDeadline.getHours() % 12
         : 12
     }:${
-      taskDeadline.getMinutes() < 10
-        ? `0${taskDeadline.getMinutes()}`
-        : taskDeadline.getMinutes()
-    } ${taskDeadline.getHours() >= 12 ? "PM" : "AM"}`;
+      TaskDeadline.getMinutes() < 10
+        ? `0${TaskDeadline.getMinutes()}`
+        : TaskDeadline.getMinutes()
+    } ${TaskDeadline.getHours() >= 12 ? "PM" : "AM"}`;
   }
 
   // EDIT INPUT FOR DATE/TIME, MAKE IT ONE INPUT THEN SET IT TO TYPE datetime-local
@@ -75,7 +137,10 @@ export default function PendingForm({
       {isEditing ? (
         <>
           <div className="m-4 flex items-start">
-            <img className="w-[109px] h-[109px]" src={String(taskImage)} />
+            <img
+              className="w-[109px] h-[109px]"
+              src={`data:image/ [image format];base64,${ImageData}`}
+            />
             <div className="mx-auto my-auto">
               <input
                 type="text"
@@ -102,7 +167,14 @@ export default function PendingForm({
           </div>
           <div className="m-4 flex justify-start space-x-4">
             <button
-              onClick={handleSaveEdit}
+              onClick={() =>
+                HandleSaveUpdateTask(
+                  _id,
+                  editedTaskName,
+                  editedDeadline,
+                  editedTaskDescription
+                )
+              }
               disabled={!editedTaskName || !editedTaskDescription}
               className="bg-button-red p-1 rounded-lg hover:bg-red-900 disabled:bg-red-900"
             >
@@ -119,16 +191,19 @@ export default function PendingForm({
       ) : (
         <div>
           <div className="m-4 flex items-start">
-            <img className="w-[109px] h-[109px]" src={String(taskImage)} />
+            <img
+              className="w-[109px] h-[109px]"
+              src={`data:image/ [image format];base64,${ImageData}`}
+            />
             <div className="mx-auto my-auto">
-              <p className="text-xl text-center font-semibold">{`${taskName}-${id}`}</p>
+              <p className="text-xl text-center font-semibold">{`${TaskName}`}</p>
               <p className="text-xl text-center text-red-800">
-                {formatDate(taskDeadline)}
+                {formatDate(TaskDeadline)}
               </p>
             </div>
           </div>
           <div className="m-4 w-auto h-[107px] bg-white overflow-y-scroll">
-            <p className="m-2 text-justify">{taskDescription}</p>
+            <p className="m-2 text-justify">{TaskDescription}</p>
           </div>
         </div>
       )}
@@ -143,7 +218,7 @@ export default function PendingForm({
           </button>
           {onDone && (
             <button
-              onClick={() => onDone(id)}
+              onClick={() => onDone(_id)}
               className="bg-button-red p-1 rounded-lg hover:bg-red-900"
             >
               Done
@@ -151,7 +226,7 @@ export default function PendingForm({
           )}
           {onDelete && (
             <button
-              onClick={() => onDelete(id)}
+              onClick={() => HandleDeleteTask(_id)}
               className="bg-button-red p-1 rounded-lg hover:bg-red-900"
             >
               Delete
