@@ -33,13 +33,13 @@ export const ZnewTaskSchemaServer = z.object({
     .nullable(),
 });
 
-export const ZloginSignupSchemaServer = z.object({
-  email: z.string().email("Enter a valid email address!"),
-  password: z.string().min(8, "Password must be at least 8 characters!"),
+export const ZloginSchemaServer = z.object({
+  email: z.string().email({ message: "Enter a valid email address!" }),
+  password: z.string(),
   confirmPassword: z.string().optional(),
 });
 
-export const ZsignupSchemaServer = ZloginSignupSchemaServer.refine(
+export const ZsignupSchemaServer = ZloginSchemaServer.refine(
   (value) => value.confirmPassword === value.password,
   {
     message: "Passwords do not match!",

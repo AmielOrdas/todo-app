@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import logo from "../assets/logo_fixed.png";
 import "../index.css";
 import { useForm } from "react-hook-form";
-import { TloginSignupSchema, ZloginSignupSchema } from "../../../lib/types";
+import { TloginSignupSchema, ZloginSchema } from "../../../lib/types";
 import NavigateAuthentication from "../Components/NavigateAuthentication";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +16,7 @@ export default function Login() {
     setError,
     reset,
   } = useForm<TloginSignupSchema>({
-    resolver: zodResolver(ZloginSignupSchema),
+    resolver: zodResolver(ZloginSchema),
   });
 
   const navigateTo = useNavigate();

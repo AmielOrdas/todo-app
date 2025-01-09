@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import {
-  ZloginSignupSchemaServer,
+  ZloginSchemaServer,
   ZsignupSchemaServer,
 } from "../../../lib/serverTypes";
 import { ZodError } from "zod";
@@ -20,15 +20,16 @@ const router = express.Router();
 // LOGIN POST ROUTE
 router.post(
   "/login",
-  validateData(ZloginSignupSchemaServer),
+  validateData(ZloginSchemaServer),
   async (req: Request, res: Response) => {
     try {
+      console.log("LOGIN ROUTE");
       // Connect to Database
       await connectMongoAtlas();
       // Get UserCollection
       const { UserCollection } = getDBVariables();
       // Get Input from Client
-      const loginData = ZloginSignupSchemaServer.safeParse(req.body);
+      const loginData = ZloginSchemaServer.safeParse(req.body);
       // Initialize properties for authentication purposes
       const email = loginData.data?.email;
       const password = loginData.data?.password;

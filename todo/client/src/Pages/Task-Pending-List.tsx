@@ -31,7 +31,7 @@ export default function TaskPendingList() {
           (task: TpendingTaskProps) => (task.TaskDeadline = new Date(task.TaskDeadline))
         );
 
-        console.log("Modified Data:", data.modifiedData);
+        console.log("Modified Data:", data.modifiedData); 
         // Update Pending Tasks
         setPendingTasks(data.modifiedData);
       } catch (error) {
@@ -121,13 +121,15 @@ export default function TaskPendingList() {
   };
 
   // Function to set a pending task into done task
-  const handleDone = (_id: string) => {
-    setPendingTasks((prevPendingTask) =>
-      prevPendingTask.map((task) =>
-        task._id === _id ? { ...task, isPending: false } : task
-      )
-    );
-  };
+  // const handleDone = (_id: string) => {
+  //   // This just removes the task from pendingTask page
+
+  //   setPendingTasks((prevPendingTask) =>
+  //     prevPendingTask.map((task) =>
+  //       task._id === _id ? { ...task, isPending: false } : task
+  //     )
+  //   );
+  // };
 
   // Function to move a pending task into the tasks done
   // const handleDone = (id: number) => {
@@ -158,8 +160,8 @@ export default function TaskPendingList() {
   //   });
   // };
 
-  // Function to remove a pending task
-  const handleDelete = (_id: string) => {
+  // Function to remove a pending task when set to done or deleted
+  const handleRemove = (_id: string) => {
     setPendingTasks((prevPendingTasks) => {
       const updatedPendingTasks = prevPendingTasks.filter(
         (prevPendingTask) => prevPendingTask._id !== _id
@@ -209,8 +211,8 @@ export default function TaskPendingList() {
               key={task._id}
               {...task}
               onEdit={handleEdit}
-              onDone={handleDone}
-              onDelete={handleDelete}
+              onDone={handleRemove}
+              onDelete={handleRemove}
             />
           ))}
         </div>

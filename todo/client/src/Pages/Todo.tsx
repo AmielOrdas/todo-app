@@ -31,10 +31,6 @@ export default function Todo() {
   //   verify();
   // }, []);
 
-  const [message, setMessage] = useState({
-    messagePort: "",
-  });
-
   return (
     <>
       <Navigation />
