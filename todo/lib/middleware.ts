@@ -11,6 +11,7 @@ export function validateData(schema: any) {
 
     if (!parseResult.success) {
       // Validation failed, send error response
+      console.log("FAILED VALIDATION");
       return res.status(400).json({
         message: "Validation failed. Please input the necessary information",
         errors: parseResult.error.errors,
@@ -23,7 +24,11 @@ export function validateData(schema: any) {
 }
 
 // Middleware for Authentication
-export const authenticateUser = (req: Request, res: Response, next: NextFunction) => {
+export const authenticateUser = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   // Get token when token is in authorization header
   // const token = req.headers.authorization?.split(" ")[1];
 

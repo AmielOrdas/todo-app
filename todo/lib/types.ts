@@ -1,35 +1,38 @@
 import { z } from "zod";
 import { Collection } from "mongodb";
 
-export const ZloginSignupSchema = z.object({
-  email: z
-    .string()
-    .email("Enter a valid email address!")
-    .refine(
-      (value) => value.endsWith("@gmail.com") || value.endsWith("@yahoo.com"),
-      {
-        message: "Email must be a gmail or yahoo account",
-      }
-    ),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters!")
-    .refine((value) => /[A-Z]/.test(value), {
-      message: "Password must contain at least one uppercase letter",
-    })
-    .refine((value) => /[0-9]/.test(value), {
-      message: "Password must contain at least one number",
-    }),
+export const ZloginSchema = z.object({
+  email: z.string().email({ message: "Email is required" }),
+  password: z.string().min(1, { message: "Password is required" }),
   confirmPassword: z.string().optional(),
 });
 
-export const ZsignupSchema = ZloginSignupSchema.refine(
-  (value) => value.confirmPassword === value.password,
-  {
+export const ZsignupSchema = z
+  .object({
+    email: z
+      .string()
+      .email("Enter a valid email address!")
+      .refine(
+        (value) => value.endsWith("@gmail.com") || value.endsWith("@yahoo.com"),
+        {
+          message: "Email must be a gmail or yahoo account",
+        }
+      ),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters!")
+      .refine((value) => /[A-Z]/.test(value), {
+        message: "Password must contain at least one uppercase letter",
+      })
+      .refine((value) => /[0-9]/.test(value), {
+        message: "Password must contain at least one number",
+      }),
+    confirmPassword: z.string().optional(),
+  })
+  .refine((value) => value.confirmPassword === value.password, {
     message: "Passwords do not match!",
     path: ["confirmPassword"],
-  }
-);
+  });
 
 if (typeof window !== "undefined") {
 }
@@ -127,7 +130,7 @@ export const ZnewTaskSchemaServer = z.object({
   }),
 });
 
-export type TloginSignupSchema = z.infer<typeof ZloginSignupSchema>;
+export type TloginSignupSchema = z.infer<typeof ZloginSchema>;
 
 export type TnewTaskSchemaClient = z.infer<typeof ZnewTaskSchemaClient>;
 
