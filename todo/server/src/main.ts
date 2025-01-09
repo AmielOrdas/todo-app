@@ -28,7 +28,7 @@ app.use(cookieParser());
   }
 })();
 
-export const { TaskCollection, UserCollection } = getDBVariables();
+const { TaskCollection, UserCollection } = getDBVariables();
 
 app.use("/users", UserRoutes);
 

@@ -13,6 +13,7 @@ export default function Signup() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    setError,
     reset,
   } = useForm<TloginSignupSchema>({
     resolver: zodResolver(ZsignupSchema),
@@ -34,13 +35,30 @@ export default function Signup() {
       console.log(response.data.message);
 
       if (response.data.Status === "Success") {
+        // Reset
+        reset();
         // Navigate to Login Page After Account Creation
         navigateTo("/login");
       }
     } catch (error: any) {
-      console.log(error.response.data.message);
+      // console.log(error.response.data.message);
+      if (axios.isAxiosError(error) && error.response) {
+        // Get Status and Error Response
+        const status: number = error.response.status;
+        const serverErrorMessage: string = error.response.data.error;
+        console.log(status);
+        console.log(serverErrorMessage);
+        // Set Whichever Error Received from Server
+        if (status === 409) {
+          setError("email", { type: "server", message: serverErrorMessage });
+        } else {
+          setError("root", {
+            type: "server",
+            message: "Unexpected error occurred",
+          });
+        }
+      }
     }
-    reset();
   }
 
   // async function HandleSignup(data: TloginSignupSchema) {
@@ -79,40 +97,58 @@ export default function Signup() {
           </h1>
           <form onSubmit={handleSubmit(HandleSignup)}>
             <div className="m-4">
-              <h1 className="text-lg">Email:</h1>
+              <h1 className="text-lg">
+                Email{" "}
+                {errors.email && (
+                  <label className="text-red-600 italic text-sm">{` (${errors.email.message})`}</label>
+                )}
+              </h1>
               <input
                 {...register("email")}
-                className="text-lg bg-input-green w-full rounded"
+                className={
+                  !errors.email
+                    ? "text-lg bg-input-green w-full rounded placeholder:italic placeholder:text-slate-500"
+                    : "text-lg bg-input-green w-full rounded placeholder:italic placeholder:text-red-500"
+                }
                 type="email"
                 placeholder="  Enter email"
               />
-              {errors.email && (
-                <p className="text-red-500">{`${errors.email.message}`}</p>
-              )}
             </div>
             <div className="m-4">
-              <h1 className="text-lg">Password:</h1>
+              <h1 className="text-lg">
+                Password{" "}
+                {errors.password && (
+                  <label className="text-red-600 italic text-sm">{` (${errors.password.message})`}</label>
+                )}
+              </h1>
               <input
                 {...register("password")}
-                className="text-lg bg-input-green w-full rounded"
+                className={
+                  !errors.password
+                    ? "text-lg bg-input-green w-full rounded placeholder:italic placeholder:text-slate-500"
+                    : "text-lg bg-input-green w-full rounded placeholder:italic placeholder:text-red-500"
+                }
                 type="password"
                 placeholder="  Enter password"
               />
-              {errors.password && (
-                <p className="text-red-500">{`${errors.password.message}`}</p>
-              )}
             </div>
             <div className="m-4">
-              <h1 className="text-lg">Confirm Password:</h1>
+              <h1 className="text-lg">
+                Confirm Password{" "}
+                {errors.confirmPassword && (
+                  <label className="text-red-600 italic text-sm">{` (${errors.confirmPassword.message})`}</label>
+                )}
+              </h1>
               <input
                 {...register("confirmPassword")}
-                className="text-lg bg-input-green w-full rounded"
+                className={
+                  !errors.confirmPassword
+                    ? "text-lg bg-input-green w-full rounded placeholder:italic placeholder:text-slate-500"
+                    : "text-lg bg-input-green w-full rounded placeholder:italic placeholder:text-red-500"
+                }
                 type="password"
                 placeholder="  Confirm password"
               />
-              {errors.confirmPassword && (
-                <p className="text-red-500">{`${errors.confirmPassword.message}`}</p>
-              )}
             </div>
             <div className="flex justify-around pt-2 pb-6">
               <button

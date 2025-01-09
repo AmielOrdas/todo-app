@@ -49,6 +49,17 @@ export const ZsignupSchemaServer = ZloginSignupSchemaServer.refine(
 
 export const TImage = ["image/jpeg", "image/png", "image/gif"];
 
+export type TdatabaseTaskProps = {
+  _id: string;
+  name: string;
+  deadline: Date;
+  description: string;
+  imageName: string;
+  imageData: string;
+  isPending: boolean;
+  userID: string;
+};
+
 declare global {
   namespace Express {
     interface Request {
