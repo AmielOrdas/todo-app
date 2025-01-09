@@ -189,11 +189,11 @@ export default function TaskPendingList() {
   // Get total pages
   const totalPages = Math.ceil(pendingTasks.length / tasksPerPage);
   // Pagination Logic
-  function getPaginatedTasks() {
+  const getPaginatedTasks = () => {
     const startIndex = (currentPage - 1) * tasksPerPage;
     const endIndex = startIndex + tasksPerPage;
     return pendingTasks.slice(startIndex, endIndex);
-  }
+  };
   // const startIndex = (currentPage - 1) * tasksPerPage;
   // const endIndex = startIndex + tasksPerPage;
   // const currentPendingTasks = pendingTasks.slice(startIndex, endIndex);

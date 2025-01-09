@@ -30,8 +30,7 @@ export default function PendingForm({
   const [editedDeadline, setEditedDeadline] = useState(
     TaskDeadline.toISOString().slice(0, 16)
   ); // Datetime-local input
-  const [editedTaskDescription, setEditedTaskDescription] =
-    useState(TaskDescription);
+  const [editedTaskDescription, setEditedTaskDescription] = useState(TaskDescription);
 
   // Function to Save and Update Task
   const HandleSaveUpdateTask = async (
@@ -113,9 +112,7 @@ export default function PendingForm({
         ? `0${TaskDeadline.getMonth() + 1}`
         : TaskDeadline.getMonth() + 1
     }-${
-      TaskDeadline.getDate() < 10
-        ? `0${TaskDeadline.getDate()}`
-        : TaskDeadline.getDate()
+      TaskDeadline.getDate() < 10 ? `0${TaskDeadline.getDate()}` : TaskDeadline.getDate()
     }\n${
       TaskDeadline.getHours() < 10 && TaskDeadline.getHours() !== 0
         ? `0${TaskDeadline.getHours()}`
@@ -208,7 +205,7 @@ export default function PendingForm({
         </div>
       )}
 
-      {!isEditing && (
+      {isEditing || (
         <div className="m-4 flex justify-start space-x-4">
           <button
             onClick={() => setIsEditing(true)}
@@ -216,6 +213,7 @@ export default function PendingForm({
           >
             Edit
           </button>
+          {/*onDone && is for undefined checking only, it is not needed because it will always return true. */}
           {onDone && (
             <button
               onClick={() => onDone(_id)}
@@ -224,6 +222,7 @@ export default function PendingForm({
               Done
             </button>
           )}
+          {/*onDelete && is for undefined checking only, it is not needed because it will always return true. */}
           {onDelete && (
             <button
               onClick={() => HandleDeleteTask(_id)}
