@@ -90,9 +90,7 @@ export default function TaskPendingList() {
   // Function to set a pending task into done task
   const handleDone = (id: number) => {
     setPendingTasks((prevPendingTask) =>
-      prevPendingTask.map((task) =>
-        task.id === id ? { ...task, isDone: true } : task
-      )
+      prevPendingTask.map((task) => (task.id === id ? { ...task, isDone: true } : task))
     );
   };
 
