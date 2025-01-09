@@ -5,8 +5,9 @@ import { ZodError } from "zod";
 import { validateData, authenticateUser } from "../../../lib/middleware";
 import multer from "multer";
 import { connectMongoAtlas, getDBVariables } from "../database/db";
-import { ObjectId } from "mongodb";
-
+import { ObjectId, WithId } from "mongodb";
+import { TpendingTaskProps, TmodifiedTaskPendingProps } from "../../../lib/types";
+import { TdatabaseTaskProps } from "../../../lib/serverTypes";
 const router = express.Router();
 
 const assets = multer.memoryStorage();
@@ -49,38 +50,46 @@ router.post(
   }
 );
 
-router.get(
-  "/pending",
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    try {
-      // Connect to Database
-      await connectMongoAtlas();
-      // Get TaskCollection
-      const { TaskCollection } = getDBVariables();
-      // Get userID from cookie's token
-      const userID = req.user?._id;
-      // Fetch all pending tasks from database using userID as key - Convert Cursor to Array
-      const pendingTasks = await TaskCollection.find({
-        userID,
-        isPending: true,
-      }).toArray();
-      console.log(userID);
-      if (pendingTasks.length === 0) {
-        return res
-          .status(404)
-          .json({ pendingTasks: [], message: "User has no pending tasks" });
-      } else {
-        return res.status(200).json({
-          pendingTasks,
-          message: "Successfully fetched pending tasks",
-        });
-      }
-    } catch (error) {
-      console.error(error);
+router.get("/pending", authenticateUser, async (req: Request, res: Response) => {
+  try {
+    // Connect to Database
+    await connectMongoAtlas();
+    // Get TaskCollection
+    const { TaskCollection } = getDBVariables();
+    // Get userID from cookie's token
+    const userID = req.user?._id;
+    // Fetch all pending tasks from database using userID as key - Convert Cursor to Array
+    const pendingTasks = (await TaskCollection.find({
+      userID,
+      isPending: true,
+    }).toArray()) as WithId<TdatabaseTaskProps>[];
+
+    console.log(pendingTasks);
+
+    const modifiedData = pendingTasks.map((myData: TdatabaseTaskProps) => ({
+      _id: myData._id,
+      TaskName: myData.name,
+      TaskDeadline: myData.deadline,
+      TaskDescription: myData.description,
+      ImageName: myData.imageName,
+      ImageData: myData.imageData,
+      isPending: myData.isPending,
+    }));
+
+    if (pendingTasks.length === 0) {
+      return res
+        .status(404)
+        .json({ pendingTasks: [], message: "User has no pending tasks" });
+    } else {
+      return res.status(200).json({
+        modifiedData,
+        message: "Successfully fetched pending tasks",
+      });
     }
+  } catch (error) {
+    console.error(error);
   }
-);
+});
 
 router.get("/finished", (req: Request, res: Response) => {
   res.send({ message: "Hello from get all forms" });

@@ -50,7 +50,7 @@ export const ZsignupSchemaServer = ZloginSignupSchemaServer.refine(
 export const TImage = ["image/jpeg", "image/png", "image/gif"];
 
 export type TdatabaseTaskProps = {
-  _id: string;
+  _id: ObjectId;
   name: string;
   deadline: Date;
   description: string;

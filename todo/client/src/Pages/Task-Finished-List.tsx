@@ -1,3 +1,10 @@
+import Navigation from "../Components/Navigation";
+
 export default function TaskFinishedList() {
-  return <div>XD</div>;
+  return (
+    <>
+      <Navigation />
+      <main className="min-h-screen bg-background-color-main pt-[120px]"></main>
+    </>
+  );
 }

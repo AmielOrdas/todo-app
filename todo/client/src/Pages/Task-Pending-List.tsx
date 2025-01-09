@@ -25,28 +25,15 @@ export default function TaskPendingList() {
           throw new Error("Failed to fetch pending tasks");
         }
         const data = await response.json();
-        console.log("PendingTasks:", data.pendingTasks);
+        console.log("PendingTasks:", data.modifiedData);
         // Convert String Date into Date object
-        data.pendingTasks.forEach(
-          (task: TdatabaseTaskProps) => (task.deadline = new Date(task.deadline))
-        );
-        const modifiedData: TpendingTaskProps[] = data.pendingTasks.map(
-          (myData: TdatabaseTaskProps) => ({
-            _id: myData._id,
-            TaskName: myData.name,
-            TaskDeadline: myData.deadline,
-            TaskDescription: myData.description,
-            ImageName: myData.imageName,
-            ImageData: myData.imageData,
-            isPending: myData.isPending,
-          })
+        data.modifiedData.forEach(
+          (task: TpendingTaskProps) => (task.TaskDeadline = new Date(task.TaskDeadline))
         );
 
-        // console.log(data.pendingTasks);
-
-        console.log("Modified Data:", modifiedData);
+        console.log("Modified Data:", data.modifiedData);
         // Update Pending Tasks
-        setPendingTasks(modifiedData);
+        setPendingTasks(data.modifiedData);
       } catch (error) {
         console.log(error);
       }
