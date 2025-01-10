@@ -6,7 +6,7 @@ import { validateData, authenticateUser } from "../../../lib/middleware";
 import multer from "multer";
 import { connectMongoAtlas, getDBVariables } from "../database/db";
 import { ObjectId, WithId } from "mongodb";
-import { TpendingTaskProps, TmodifiedTaskPendingProps } from "../../../lib/types";
+
 import { TdatabaseTaskProps } from "../../../lib/serverTypes";
 const router = express.Router();
 
@@ -91,16 +91,89 @@ router.get("/pending", authenticateUser, async (req: Request, res: Response) => 
   }
 });
 
-router.get("/finished", (req: Request, res: Response) => {
-  res.send({ message: "Hello from get all forms" });
+router.get("/finished", authenticateUser, async (req: Request, res: Response) => {
+  try {
+    // Connect to Database
+    await connectMongoAtlas();
+    // Get TaskCollection
+    const { TaskCollection } = getDBVariables();
+    // Get userID from cookie's token
+    const userID = req.user?._id;
+    // Fetch all pending tasks from database using userID as key - Convert Cursor to Array
+    const pendingTasks = (await TaskCollection.find({
+      userID,
+      isPending: false,
+    }).toArray()) as WithId<TdatabaseTaskProps>[];
+
+    const modifiedData = pendingTasks.map((myData: TdatabaseTaskProps) => ({
+      _id: myData._id,
+      TaskName: myData.name,
+      TaskDeadline: myData.deadline,
+      TaskDescription: myData.description,
+      ImageName: myData.imageName,
+      ImageData: myData.imageData,
+      isPending: myData.isPending,
+    }));
+
+    if (pendingTasks.length === 0) {
+      return res
+        .status(404)
+        .json({ finishedTasks: [], message: "User has no finished tasks" });
+    } else {
+      return res.status(200).json({
+        modifiedData,
+        message: "Successfully fetched pending tasks",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 router
   .route("/:id")
-  .get((req: Request, res: Response) => {
-    res.send({
-      message: `Hello from get specific form with an ID of ${req.params.id}`,
-    });
+  .get(authenticateUser, async (req: Request, res: Response) => {
+    // Retrieve ID and Key/Value Pairs
+    const { id } = req.params;
+    const { TaskName, TaskDeadline, TaskDescription } = req.body;
+    // Retrieve User ID from cookie
+    const userID = req.user?._id;
+
+    try {
+      await connectMongoAtlas();
+      // Get TaskCollection
+      const { TaskCollection } = getDBVariables();
+
+      // Find Task
+
+      const task = (await TaskCollection.find({
+        userID,
+        _id: new ObjectId(id),
+      }).toArray()) as WithId<TdatabaseTaskProps>[];
+
+      const modifiedData = task.map((myData: TdatabaseTaskProps) => ({
+        _id: myData._id,
+        TaskName: myData.name,
+        TaskDeadline: myData.deadline,
+        TaskDescription: myData.description,
+        ImageName: myData.imageName,
+        ImageData: myData.imageData,
+        isPending: myData.isPending,
+      }));
+
+      if (task.length === 0) {
+        return res
+          .status(404)
+          .json({ task: [], message: "Task not found in the database or Unauthorized" });
+      } else {
+        return res.status(200).json({
+          modifiedData,
+          message: "Successfully fetched the task",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
   })
   .put(authenticateUser, async (req: Request, res: Response) => {
     // Retrieve ID and Key/Value Pairs
@@ -143,6 +216,7 @@ router
     const { id } = req.params;
     // Retrieve User ID from cookie
     const userID = req.user?._id;
+    const { TaskName, TaskDeadline, TaskDescription } = req.body;
     try {
       // Connect to Database
       await connectMongoAtlas();
@@ -165,5 +239,34 @@ router
       console.error(error);
     }
   });
+
+router.put(
+  "/:id/ModifyIsPending",
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    // Retrieve Task ID
+    const { id } = req.params;
+    // Retrieve User ID from cookie
+    const userID = req.user?._id;
+
+    const { isPending } = req.body;
+
+    try {
+      await connectMongoAtlas();
+      const { TaskCollection } = getDBVariables();
+      // Update Task
+      const result = await TaskCollection.updateOne(
+        { _id: new ObjectId(id), userID },
+        {
+          $set: {
+            isPending,
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
+);
 
 export default router;

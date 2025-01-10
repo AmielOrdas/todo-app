@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { TpendingTaskProps } from "../../../lib/types";
+import { TtaskProps } from "../../../lib/types";
 import { TdatabaseTaskProps } from "../../../lib/serverTypes";
 import Navigation from "../Components/Navigation";
 import PendingForm from "../Components/PendingForm";
@@ -9,7 +9,7 @@ export default function TaskPendingList() {
   // Make the Props Dynamic by Stateful Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const tasksPerPage = 4;
-  const [pendingTasks, setPendingTasks] = useState<TpendingTaskProps[]>([]);
+  const [pendingTasks, setPendingTasks] = useState<TtaskProps[]>([]);
 
   // Fetch Pending Tasks Once Page Mounts
   useEffect(() => {
@@ -25,13 +25,13 @@ export default function TaskPendingList() {
           throw new Error("Failed to fetch pending tasks");
         }
         const data = await response.json();
-        console.log("PendingTasks:", data.modifiedData);
+        const [XD] = data.modifiedData;
+        console.log("XD: ", XD);
         // Convert String Date into Date object
         data.modifiedData.forEach(
-          (task: TpendingTaskProps) => (task.TaskDeadline = new Date(task.TaskDeadline))
+          (task: TtaskProps) => (task.TaskDeadline = new Date(task.TaskDeadline))
         );
 
-        console.log("Modified Data:", data.modifiedData); 
         // Update Pending Tasks
         setPendingTasks(data.modifiedData);
       } catch (error) {
@@ -43,7 +43,7 @@ export default function TaskPendingList() {
   }, []);
 
   // Props for Testing PendingForm Component
-  // const [pendingTasks, setPendingTasks] = useState<TpendingTaskProps[]>([
+  // const [pendingTasks, setPendingTasks] = useState<TtaskProps[]>([
   //   {
   //     id: 1,
   //     isPending: true,
@@ -97,7 +97,7 @@ export default function TaskPendingList() {
   // ]);
 
   // Placeholder Array for Tasks Done
-  // const [doneTasks, setDoneTasks] = useState<TpendingTaskProps[]>([]);
+  // const [doneTasks, setDoneTasks] = useState<TtaskProps[]>([]);
 
   // Function for editing pending task properties
   const handleEdit = (
@@ -166,10 +166,7 @@ export default function TaskPendingList() {
       const updatedPendingTasks = prevPendingTasks.filter(
         (prevPendingTask) => prevPendingTask._id !== _id
       );
-      return updatedPendingTasks.map((pendingTask) => ({
-        ...pendingTask,
-        // id: index + 1,
-      }));
+      return updatedPendingTasks;
     });
   };
 

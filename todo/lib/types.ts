@@ -12,12 +12,9 @@ export const ZsignupSchema = z
     email: z
       .string()
       .email("Enter a valid email address!")
-      .refine(
-        (value) => value.endsWith("@gmail.com") || value.endsWith("@yahoo.com"),
-        {
-          message: "Email must be a gmail or yahoo account",
-        }
-      ),
+      .refine((value) => value.endsWith("@gmail.com") || value.endsWith("@yahoo.com"), {
+        message: "Email must be a gmail or yahoo account",
+      }),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters!")
@@ -146,7 +143,7 @@ export type collections = {
 };
 
 // Types for  Pending Task Props
-export const ZpendingTaskSchema = z.object({
+export const ZTaskSchema = z.object({
   _id: z.string(),
   TaskName: z.string().min(1, "Task name is required!"),
   TaskDeadline: z.date(),
@@ -155,9 +152,9 @@ export const ZpendingTaskSchema = z.object({
   ImageData: z.string(),
   isPending: z.boolean(),
 });
-export type TpendingTaskProps = z.infer<typeof ZpendingTaskSchema>;
+export type TtaskProps = z.infer<typeof ZTaskSchema>;
 
-export type TmodifiedTaskPendingProps = TpendingTaskProps & {
+export type TmodifiedPendingTaskProps = TtaskProps & {
   onEdit?: (
     _id: string,
     newTaskName: string,
@@ -166,6 +163,11 @@ export type TmodifiedTaskPendingProps = TpendingTaskProps & {
   ) => void;
   onDone?: (_id: string) => void;
   onDelete?: (_id: string) => void;
+};
+
+export type TmodifiedFinishedTaskProps = TtaskProps & {
+  onPending?: (_id: string) => void;
+  onDelete: (_id: string) => void;
 };
 
 // MAKE SCHEMA AND PROPERTIES CONSISTENT THROUGHOUT DIFFERENT PAGES?

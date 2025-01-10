@@ -2,6 +2,7 @@ import Todo from "./Pages/Todo";
 import Login from "./Pages/Login";
 import TaskFinishedList from "./Pages/Task-Finished-List";
 import TaskPendingList from "./Pages/Task-Pending-List";
+import TaskViewForm from "./Pages/Task-View-Form";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "./index.css";
 import { useEffect } from "react";
@@ -26,6 +27,7 @@ function App() {
       <Route path="/pending-tasks" element={<TaskPendingList />} />
       <Route path="/finished-tasks" element={<TaskFinishedList />} />
       <Route path="/signup" element={<SignUp />} />
+      <Route path="/task/:taskName" element={<TaskViewForm />} />
     </Routes>
   );
 }
