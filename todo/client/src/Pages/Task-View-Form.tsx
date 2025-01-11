@@ -25,7 +25,8 @@ export default function TaskViewForm() {
         const data = await response.json();
         const rawTask = data.modifiedData;
         data.modifiedData.forEach(
-          (task: TtaskProps) => (task.TaskDeadline = new Date(task.TaskDeadline))
+          (task: TtaskProps) =>
+            (task.TaskDeadline = new Date(task.TaskDeadline))
         );
         const newData = data.modifiedData.map((task: TtaskProps) => ({
           ...task, // Copy all properties from the task object
@@ -78,7 +79,7 @@ export default function TaskViewForm() {
     <>
       <Navigation />
       <main className="min-h-screen bg-background-color-main pt-[5px]">
-        <div className="text-center my-[200px]">
+        <div className="text-center my-[160px]">
           {task.map((task) =>
             taskPending ? (
               <PendingForm

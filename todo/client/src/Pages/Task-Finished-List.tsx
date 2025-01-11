@@ -19,11 +19,13 @@ export default function TaskFinishedList() {
         if (!response.ok) {
           throw new Error("Failed to fetch tasks");
         }
+
         const data = await response.json();
 
         // Convert String Date into Date object
         data.modifiedData.forEach(
-          (task: TtaskProps) => (task.TaskDeadline = new Date(task.TaskDeadline))
+          (task: TtaskProps) =>
+            (task.TaskDeadline = new Date(task.TaskDeadline))
         );
 
         // Update finished Tasks
@@ -64,7 +66,7 @@ export default function TaskFinishedList() {
   return (
     <>
       <Navigation />
-      <main className="min-h-screen bg-background-color-main pt-[120px]">
+      <main className="min-h-screen bg-background-color-main pt-[5px]">
         <div className="grid grid-cols-2 grid-rows-2 gap-4 justify-items-center py-4">
           {finishedTasksPerPage.map((task) => (
             <FinishedForm

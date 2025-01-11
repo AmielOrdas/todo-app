@@ -2,18 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { TmodifiedPendingTaskProps } from "../../../lib/types";
 import logo from "../assets/logo_fixed.png";
-// Remove "Edit" Button for Finished Tasks and Add "Delete" Button
-
-// type TmodifiedPendingTaskProps = TpendingTaskProps & {
-//   onEdit?: (
-//     id: number,
-//     newTaskName: string,
-//     newTaskDeadline: Date,
-//     newTaskDescription: string
-//   ) => void;
-//   onDone?: (id: number) => void;
-//   onDelete?: (id: number) => void;
-// };
 
 export default function PendingForm({
   _id,
@@ -32,14 +20,14 @@ export default function PendingForm({
   const [editedDeadline, setEditedDeadline] = useState(
     TaskDeadline.toISOString().slice(0, 16)
   ); // Datetime-local input
-  const [editedTaskDescription, setEditedTaskDescription] = useState(TaskDescription);
+  const [editedTaskDescription, setEditedTaskDescription] =
+    useState(TaskDescription);
   const currentDate = new Date();
   // Stateful Variable for Checking if Task Lapsed
   const [color, setColor] = useState<String>(
     currentDate < TaskDeadline ? "bg-[#ADA823]" : "bg-[#e83d3d]"
   );
   const params = useParams();
-  console.log(params.taskName);
   const [isView, setIsView] = useState(params.taskName ? true : false);
   const navigate = useNavigate();
   // useEffect to check if task lapsed
@@ -56,46 +44,6 @@ export default function PendingForm({
     return () => clearInterval(interval); // Cleanup code
   }, [TaskDeadline]); // Restart interval if TaskDeadline changes
 
-  // useEffect(() => {
-  //   CheckDue(TaskDeadline);
-  //   console.log("USED");
-  // }, [currentDate, TaskDeadline]);
-
-  // useEffect(() => {
-  //   // Update currentDate periodically
-  //   const interval = setInterval(() => {
-  //     setCurrentDate(new Date());
-  //   }, 1000); // Update every second
-
-  //   return () => clearInterval(interval); // Cleanup interval on component unmount
-  // }, []);
-
-  // Check Every Minute - This will be used as flag to compare
-  // const previousMinute = useRef(new Date().getMinutes());
-
-  // const CheckDue = setInterval((TaskDeadline: Date) => {
-  //   const currentDate = new Date();
-  //   const currentMinute = currentDate.getMinutes();
-
-  //   // Verify if a minute has passed
-  //   if (currentMinute !== previousMinute.current) {
-  //     // Update the minute
-  //     previousMinute.current = currentMinute;
-
-  //     // Compare the Dates
-  //     console.log("Current Date: ", currentDate);
-  //     if (currentDate < TaskDeadline) {
-  //       setIsTaskLapsed(false);
-  //     } else {
-  //       setIsTaskLapsed(true);
-  //     }
-  //   }
-  // }, 1000);
-
-  // useEffect(() => {
-  //   return () => clearInterval(CheckDue);
-  // }, []);
-
   // Function to Set a Task into Done
   const HandleDoneTask = async (_id: string) => {
     try {
@@ -105,20 +53,21 @@ export default function PendingForm({
       }
 
       // Pass _id to set task to done via server
-      const response = await fetch(`http://localhost:3000/tasks/${_id}/ModifyIsPending`, {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          isPending: false,
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:3000/tasks/${_id}/ModifyIsPending`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            isPending: false,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to delete task");
       }
-      const result = await response.json();
-      console.log(result.message);
     } catch (error) {
       console.error(error);
     }
@@ -137,10 +86,6 @@ export default function PendingForm({
         const newTaskDeadline = new Date(editedDeadline);
         onEdit(_id, editedTaskName, newTaskDeadline, editedTaskDescription);
       }
-      // console.log("_id:", _id);
-      // console.log("editedTaskName:", editedTaskName);
-      // console.log("editedDeadline:", editedDeadline);
-      // console.log("editedTaskDescription:", editedTaskDescription);
 
       // Pass _id and other updated task properties
       const response = await fetch(`http://localhost:3000/tasks/${_id}`, {
@@ -157,9 +102,6 @@ export default function PendingForm({
       if (!response.ok) {
         throw new Error("Failed to update task");
       }
-
-      const result = await response.json();
-      console.log(result.message);
 
       setIsEditing(false);
     } catch (error) {
@@ -185,19 +127,21 @@ export default function PendingForm({
       if (!response.ok) {
         throw new Error("Failed to delete task");
       }
-      const result = await response.json();
-      console.log(result.message);
+
       // Also Delete Task from Client
       if (onDelete) {
         onDelete(_id);
-        console.log("Deleted task from client successfully");
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  const HandleViewTask = (_id: string, TaskName: string, isPending: boolean) => {
+  const HandleViewTask = (
+    _id: string,
+    TaskName: string,
+    isPending: boolean
+  ) => {
     navigate(`/task/${encodeURIComponent(TaskName)}`, {
       state: { id: _id, isPending: isPending },
     });
@@ -225,11 +169,12 @@ export default function PendingForm({
     hour = hour ? hour : 12;
     // Set Formatted Date and Time
     const formattedDate = `Due: ${year}-${month}-${day}`;
-    const formattedTime = `${hour < 10 ? `0${hour}` : hour}:${minutes} ${timeSuffix}`;
+    const formattedTime = `${
+      hour < 10 ? `0${hour}` : hour
+    }:${minutes} ${timeSuffix}`;
 
     return { formattedDate, formattedTime };
   };
-  console.log("Pending");
   return (
     <div
       className={`inline-block min-h-[327px] max-w-[339px] w-full ${color} rounded-form-radius`}

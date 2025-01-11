@@ -98,6 +98,25 @@ export default function Signup() {
           <form onSubmit={handleSubmit(HandleSignup)}>
             <div className="m-4">
               <h1 className="text-lg">
+                Username{" "}
+                {errors.userName && (
+                  <label className="text-red-600 italic text-sm">{` (${errors.userName.message})`}</label>
+                )}
+              </h1>
+              <input
+                {...register("userName")}
+                className={
+                  !errors.email
+                    ? "text-lg bg-input-green w-full rounded placeholder:italic placeholder:text-slate-500"
+                    : "text-lg bg-input-green w-full rounded placeholder:italic placeholder:text-red-500"
+                }
+                type="text"
+                placeholder="  Enter username"
+              />
+            </div>{" "}
+            {/*XDD*/}
+            <div className="m-4">
+              <h1 className="text-lg">
                 Email{" "}
                 {errors.email && (
                   <label className="text-red-600 italic text-sm">{` (${errors.email.message})`}</label>

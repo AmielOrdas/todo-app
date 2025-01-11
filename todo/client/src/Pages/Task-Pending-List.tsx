@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { TtaskProps } from "../../../lib/types";
-import { TdatabaseTaskProps } from "../../../lib/serverTypes";
 import Navigation from "../Components/Navigation";
 import PendingForm from "../Components/PendingForm";
 import "../index.css";
@@ -21,14 +20,16 @@ export default function TaskPendingList() {
           credentials: "include",
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
           throw new Error("Failed to fetch pending tasks");
         }
-        const data = await response.json();
 
         // Convert String Date into Date object
         data.modifiedData.forEach(
-          (task: TtaskProps) => (task.TaskDeadline = new Date(task.TaskDeadline))
+          (task: TtaskProps) =>
+            (task.TaskDeadline = new Date(task.TaskDeadline))
         );
 
         // Update Pending Tasks
@@ -40,63 +41,6 @@ export default function TaskPendingList() {
     // Execute Fetching
     fetchPendingTasks();
   }, []);
-
-  // Props for Testing PendingForm Component
-  // const [pendingTasks, setPendingTasks] = useState<TtaskProps[]>([
-  //   {
-  //     id: 1,
-  //     isPending: true,
-  //     taskImage:
-  //       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuGQ4LhVFNt4fyeu6ZUpT_6KTxdeJ7yVpwxw&s",
-  //     taskName: "Test Task 1",
-  //     taskDeadline: new Date(2024, 11, 25, 13, 8),
-  //     taskDescription:
-  //       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore laboriosam animi id asperiores earum molestiae temporibus quibusdam accusantium tempora nam ullam fuga, voluptas ea omnis quasi consequatur minus obcaecati aperiam.",
-  //   },
-  //   {
-  //     id: 2,
-  //     isPending: true,
-  //     taskImage:
-  //       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuGQ4LhVFNt4fyeu6ZUpT_6KTxdeJ7yVpwxw&s",
-  //     taskName: "Test Task 2",
-  //     taskDeadline: new Date(2024, 11, 25, 13, 8),
-  //     taskDescription:
-  //       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore laboriosam animi id asperiores earum molestiae temporibus quibusdam accusantium tempora nam ullam fuga, voluptas ea omnis quasi consequatur minus obcaecati aperiam.",
-  //   },
-  //   {
-  //     id: 3,
-  //     isPending: true,
-  //     taskImage:
-  //       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuGQ4LhVFNt4fyeu6ZUpT_6KTxdeJ7yVpwxw&s",
-  //     taskName: "Test Task 3",
-  //     taskDeadline: new Date(2024, 11, 25, 13, 8),
-  //     taskDescription:
-  //       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore laboriosam animi id asperiores earum molestiae temporibus quibusdam accusantium tempora nam ullam fuga, voluptas ea omnis quasi consequatur minus obcaecati aperiam.",
-  //   },
-  //   {
-  //     id: 4,
-  //     isPending: true,
-  //     taskImage:
-  //       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuGQ4LhVFNt4fyeu6ZUpT_6KTxdeJ7yVpwxw&s",
-  //     taskName: "Test Task 4",
-  //     taskDeadline: new Date(2024, 11, 25, 13, 8),
-  //     taskDescription:
-  //       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore laboriosam animi id asperiores earum molestiae temporibus quibusdam accusantium tempora nam ullam fuga, voluptas ea omnis quasi consequatur minus obcaecati aperiam.",
-  //   },
-  //   {
-  //     id: 5,
-  //     isPending: true,
-  //     taskImage:
-  //       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuGQ4LhVFNt4fyeu6ZUpT_6KTxdeJ7yVpwxw&s",
-  //     taskName: "Test Task 5",
-  //     taskDeadline: new Date(2024, 11, 25, 13, 8),
-  //     taskDescription:
-  //       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore laboriosam animi id asperiores earum molestiae temporibus quibusdam accusantium tempora nam ullam fuga, voluptas ea omnis quasi consequatur minus obcaecati aperiam.",
-  //   },
-  // ]);
-
-  // Placeholder Array for Tasks Done
-  // const [doneTasks, setDoneTasks] = useState<TtaskProps[]>([]);
 
   // Function for editing pending task properties
   const handleEdit = (
@@ -183,16 +127,11 @@ export default function TaskPendingList() {
   // const endIndex = startIndex + tasksPerPage;
   // const currentPendingTasks = pendingTasks.slice(startIndex, endIndex);
 
-  // Create Function to Handle Forward Paging
-  const nextPage = () => {
+  // Create Function to Handle Pagination
+  const handlePagination = () => {
     if (currentPage < totalPages) {
       setCurrentPage((page) => page + 1);
-    }
-  };
-
-  // Create Function to Handle Backward Paging
-  const prevPage = () => {
-    if (currentPage > 1) {
+    } else if (currentPage > 1) {
       setCurrentPage((page) => page - 1);
     }
   };
@@ -215,7 +154,7 @@ export default function TaskPendingList() {
         {totalPages > 0 && (
           <div className="bottom-0 left-0 w-full flex justify-center space-x-4 p-4">
             <button
-              onClick={prevPage}
+              onClick={handlePagination}
               disabled={currentPage === 1}
               className="text-2xl font-bold bg-button-red rounded px-2 py-1 hover:bg-red-900 disabled:bg-red-900"
             >
@@ -225,7 +164,7 @@ export default function TaskPendingList() {
               Page {currentPage} of {totalPages}
             </span>
             <button
-              onClick={nextPage}
+              onClick={handlePagination}
               disabled={currentPage === totalPages}
               className="text-2xl font-bold bg-button-red rounded px-2 py-1 hover:bg-red-900 disabled:bg-red-900"
             >
@@ -234,15 +173,6 @@ export default function TaskPendingList() {
           </div>
         )}
       </main>
-      {/*THIS PART SHOULD MOVE IT INTO THE TASK DONE PAGE*/}
-      {/* <h1>DONE TASKS</h1>
-      <div>
-        {pendingTasks
-          .filter((task) => !task.isPending)
-          .map((task) => (
-            <PendingForm key={task.id} {...task} />
-          ))}
-      </div> */}
     </>
   );
 }

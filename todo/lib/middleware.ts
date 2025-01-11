@@ -24,7 +24,11 @@ export function validateData(schema: any) {
 }
 
 // Middleware for Authentication
-export const authenticateUser = (req: Request, res: Response, next: NextFunction) => {
+export const authenticateUser = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   // Get token when token is in authorization header
   // const token = req.headers.authorization?.split(" ")[1];
 
@@ -40,8 +44,13 @@ export const authenticateUser = (req: Request, res: Response, next: NextFunction
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || "");
     // Attach info to request
 
-    if (typeof decoded === "object" && "_id" in decoded && "email" in decoded) {
-      req.user = decoded as { _id: string; email: string };
+    if (
+      typeof decoded === "object" &&
+      "_id" in decoded &&
+      "email" in decoded &&
+      "userName" in decoded
+    ) {
+      req.user = decoded as { _id: string; email: string; userName: string };
       next();
     } else {
       return;

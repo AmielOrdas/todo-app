@@ -59,83 +59,99 @@ router.post(
   }
 );
 
-router.get("/pending", authenticateUser, async (req: Request, res: Response) => {
-  try {
-    // Connect to Database
-    await connectMongoAtlas();
-    // Get TaskCollection
-    const { TaskCollection } = getDBVariables();
-    // Get userID from cookie's token
-    const userID = req.user?._id;
-    // Fetch all pending tasks from database using userID as key - Convert Cursor to Array
-    const pendingTasks = (await TaskCollection.find({
-      userID,
-      isPending: true,
-    }).toArray()) as WithId<TdatabaseTaskProps>[];
+router.get(
+  "/pending",
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    try {
+      // Connect to Database
+      await connectMongoAtlas();
+      // Get TaskCollection
+      const { TaskCollection } = getDBVariables();
+      // Get userID and userName from cookie's token
+      const userID = req.user?._id;
+      const userName = req.user?.userName;
+      // Fetch all pending tasks from database using userID as key - Convert Cursor to Array
+      const pendingTasks = (await TaskCollection.find({
+        userID,
+        isPending: true,
+      }).toArray()) as WithId<TdatabaseTaskProps>[];
 
-    const modifiedData = pendingTasks.map((myData: TdatabaseTaskProps) => ({
-      _id: myData._id,
-      TaskName: myData.name,
-      TaskDeadline: myData.deadline,
-      TaskDescription: myData.description,
-      ImageName: myData.imageName,
-      ImageData: myData.imageData,
-      isPending: myData.isPending,
-    }));
+      const modifiedData = pendingTasks.map((myData: TdatabaseTaskProps) => ({
+        _id: myData._id,
+        TaskName: myData.name,
+        TaskDeadline: myData.deadline,
+        TaskDescription: myData.description,
+        ImageName: myData.imageName,
+        ImageData: myData.imageData,
+        isPending: myData.isPending,
+      }));
 
-    if (pendingTasks.length === 0) {
-      return res
-        .status(404)
-        .json({ pendingTasks: [], message: "User has no pending tasks" });
-    } else {
-      return res.status(200).json({
-        modifiedData,
-        message: "Successfully fetched pending tasks",
-      });
+      if (pendingTasks.length === 0) {
+        return res.status(404).json({
+          pendingTasks: [],
+          userName,
+          message: "User has no pending tasks",
+        });
+      } else {
+        return res.status(200).json({
+          modifiedData,
+          userName,
+          message: "Successfully fetched pending tasks",
+        });
+      }
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
   }
-});
+);
 
-router.get("/finished", authenticateUser, async (req: Request, res: Response) => {
-  try {
-    // Connect to Database
-    await connectMongoAtlas();
-    // Get TaskCollection
-    const { TaskCollection } = getDBVariables();
-    // Get userID from cookie's token
-    const userID = req.user?._id;
-    // Fetch all pending tasks from database using userID as key - Convert Cursor to Array
-    const pendingTasks = (await TaskCollection.find({
-      userID,
-      isPending: false,
-    }).toArray()) as WithId<TdatabaseTaskProps>[];
+router.get(
+  "/finished",
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    try {
+      // Connect to Database
+      await connectMongoAtlas();
+      // Get TaskCollection
+      const { TaskCollection } = getDBVariables();
+      // Get userID and userName from cookie's token
+      const userID = req.user?._id;
+      const userName = req.user?.userName;
+      // Fetch all pending tasks from database using userID as key - Convert Cursor to Array
+      const pendingTasks = (await TaskCollection.find({
+        userID,
+        isPending: false,
+      }).toArray()) as WithId<TdatabaseTaskProps>[];
 
-    const modifiedData = pendingTasks.map((myData: TdatabaseTaskProps) => ({
-      _id: myData._id,
-      TaskName: myData.name,
-      TaskDeadline: myData.deadline,
-      TaskDescription: myData.description,
-      ImageName: myData.imageName,
-      ImageData: myData.imageData,
-      isPending: myData.isPending,
-    }));
+      const modifiedData = pendingTasks.map((myData: TdatabaseTaskProps) => ({
+        _id: myData._id,
+        TaskName: myData.name,
+        TaskDeadline: myData.deadline,
+        TaskDescription: myData.description,
+        ImageName: myData.imageName,
+        ImageData: myData.imageData,
+        isPending: myData.isPending,
+      }));
 
-    if (pendingTasks.length === 0) {
-      return res
-        .status(404)
-        .json({ finishedTasks: [], message: "User has no finished tasks" });
-    } else {
-      return res.status(200).json({
-        modifiedData,
-        message: "Successfully fetched pending tasks",
-      });
+      if (pendingTasks.length === 0) {
+        return res.status(404).json({
+          finishedTasks: [],
+          userName,
+          message: "User has no finished tasks",
+        });
+      } else {
+        return res.status(200).json({
+          modifiedData,
+          userName,
+          message: "Successfully fetched pending tasks",
+        });
+      }
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
   }
-});
+);
 
 router
   .route("/:id")
@@ -143,8 +159,9 @@ router
     // Retrieve ID and Key/Value Pairs
     const { id } = req.params;
     const { TaskName, TaskDeadline, TaskDescription } = req.body;
-    // Retrieve User ID from cookie
+    // Retrieve User ID and userName from cookie
     const userID = req.user?._id;
+    const userName = req.user?.userName;
 
     try {
       await connectMongoAtlas();
@@ -169,12 +186,15 @@ router
       }));
 
       if (task.length === 0) {
-        return res
-          .status(404)
-          .json({ task: [], message: "Task not found in the database or Unauthorized" });
+        return res.status(404).json({
+          task: [],
+          userName,
+          message: "Task not found in the database or Unauthorized",
+        });
       } else {
         return res.status(200).json({
           modifiedData,
+          userName,
           message: "Successfully fetched the task",
         });
       }

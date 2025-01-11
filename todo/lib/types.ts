@@ -2,6 +2,7 @@ import { z } from "zod";
 import { Collection } from "mongodb";
 
 export const ZloginSchema = z.object({
+  userName: z.string().optional(),
   email: z.string().email({ message: "Email is required" }),
   password: z.string().min(1, { message: "Password is required" }),
   confirmPassword: z.string().optional(),
@@ -9,12 +10,16 @@ export const ZloginSchema = z.object({
 
 export const ZsignupSchema = z
   .object({
+    userName: z.string().min(1, { message: "Username is required" }),
     email: z
       .string()
       .email("Enter a valid email address!")
-      .refine((value) => value.endsWith("@gmail.com") || value.endsWith("@yahoo.com"), {
-        message: "Email must be a gmail or yahoo account",
-      }),
+      .refine(
+        (value) => value.endsWith("@gmail.com") || value.endsWith("@yahoo.com"),
+        {
+          message: "Email must be a gmail or yahoo account",
+        }
+      ),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters!")

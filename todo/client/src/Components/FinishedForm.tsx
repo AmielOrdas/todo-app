@@ -15,7 +15,7 @@ export default function PendingForm({
   const params = useParams();
   const [isView, setIsView] = useState(params.taskName ? true : false);
   const navigate = useNavigate();
-  console.log("Finished");
+
   // Function to Set a Task into Done
   const HandlePendingTask = async (_id: string) => {
     try {
@@ -25,20 +25,21 @@ export default function PendingForm({
       }
 
       // Pass _id to set task to done via server
-      const response = await fetch(`http://localhost:3000/tasks/${_id}/ModifyIsPending`, {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          isPending: true,
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:3000/tasks/${_id}/ModifyIsPending`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            isPending: true,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to update finished task to pending task");
       }
-      const result = await response.json();
-      console.log(result.message);
     } catch (error) {
       console.error(error);
     }
@@ -57,19 +58,21 @@ export default function PendingForm({
       if (!response.ok) {
         throw new Error("Failed to delete task");
       }
-      const result = await response.json();
-      console.log(result.message);
+
       // Also Delete Task from Client
       if (onDelete) {
         onDelete(_id);
-        console.log("Deleted task from client successfully");
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  const HandleViewTask = (_id: string, TaskName: string, isPending: boolean) => {
+  const HandleViewTask = (
+    _id: string,
+    TaskName: string,
+    isPending: boolean
+  ) => {
     navigate(`/task/${encodeURIComponent(TaskName)}`, {
       state: { id: _id, isPending: isPending },
     });
@@ -94,7 +97,9 @@ export default function PendingForm({
     hour = hour ? hour : 12;
     // Set Formatted Date and Time
     const formattedDate = `Due: ${year}-${month}-${day}`;
-    const formattedTime = `${hour < 10 ? `0${hour}` : hour}:${minutes} ${timeSuffix}`;
+    const formattedTime = `${
+      hour < 10 ? `0${hour}` : hour
+    }:${minutes} ${timeSuffix}`;
 
     return { formattedDate, formattedTime };
   };

@@ -1,7 +1,31 @@
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo_fixed.png";
+import { useEffect, useState } from "react";
+
 export default function Navigation() {
   const navigateTo = useNavigate();
+  const [displayName, setDisplayName] = useState("");
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/users/navName", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        const data = await response.json();
+
+        // Set Display Name to Navigation
+        setDisplayName(`${data.userName}'s Tasks`);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    // Execute fetching
+    fetchUserName();
+  }, []);
 
   const HandleSignout = async () => {
     // Call Signout Route
@@ -15,9 +39,7 @@ export default function Navigation() {
       if (!response.ok) {
         throw new Error("Could not fetch response");
       }
-      const messageResponse = await response.json();
-      console.log(messageResponse.message);
-      console.log("Signed out successfully");
+
       // Navigate to Login Page After Signing Out
       navigateTo("/login");
     } catch (error) {
@@ -28,6 +50,9 @@ export default function Navigation() {
     <header className="bg-nav-bar-color p-2">
       <nav className="flex justify-between">
         <img src={logo} className="xl:ml-[150px] lg:size-20 sm:size-40" />
+        <h1 className="font-bold m-auto text-white text-[24px]">
+          {displayName}
+        </h1>
         <div className="lg:flex justify-between items-center">
           <ul className="lg:flex justify-between items-center">
             <li className="hover:bg-[#441D1D] text-[24px] text-nav-bar-font-color px-8 max-lg: py-1 hover:font-bold">

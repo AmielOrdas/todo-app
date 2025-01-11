@@ -3,7 +3,7 @@ import TaskRoutes from "./routes/TaskRoutes";
 import UserRoutes from "./routes/UserRoutes";
 import cors from "cors";
 import { connectMongoAtlas } from "./database/db";
-import rateLimit from "express-rate-limit";
+// import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 const app = express();
 const PORT = 3000;

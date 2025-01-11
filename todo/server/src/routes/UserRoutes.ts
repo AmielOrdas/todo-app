@@ -5,7 +5,7 @@ import {
 } from "../../../lib/serverTypes";
 import { ZodError } from "zod";
 import { connectMongoAtlas, getDBVariables } from "../database/db";
-import { validateData } from "../../../lib/middleware";
+import { authenticateUser, validateData } from "../../../lib/middleware";
 // Import Libraries for Authentication and Authorization
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -46,7 +46,7 @@ router.post(
             if (response) {
               // Generate token - secret key must be at least 32 chars - expires in 1 hour
               const token = jwt.sign(
-                { _id: user._id, email: user.email },
+                { _id: user._id, email: user.email, userName: user.userName },
                 process.env.JWT_SECRET_KEY || "",
                 { expiresIn: "1h" }
               );
@@ -100,6 +100,7 @@ router.post(
       // Get data from client
       const signupData = ZsignupSchemaServer.safeParse(req.body);
       // Initialize properties for authentication purposes
+      const userName = signupData.data?.userName;
       const email = signupData.data?.email;
       const password = signupData.data?.password;
 
@@ -113,7 +114,11 @@ router.post(
         // If new record, hash password with 10x hashing rounds then insert data to database
         if (password !== undefined) {
           const hashPassword = await bcrypt.hash(password, 10);
-          await UserCollection.insertOne({ email, password: hashPassword });
+          await UserCollection.insertOne({
+            userName,
+            email,
+            password: hashPassword,
+          });
           res.status(201).json({
             Status: "Success",
             message: "Account Successfully Created",
@@ -130,6 +135,21 @@ router.post(
         console.error("Unexpected error: ", error);
         return res.status(500).json({ error: "Unexpected error" });
       }
+    }
+  }
+);
+
+// Navigation Route for Display Name
+router.get(
+  "/navName",
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    try {
+      // Get userName from cookie
+      const userName = req.user?.userName;
+      return res.json({ userName });
+    } catch (error) {
+      console.error(error);
     }
   }
 );

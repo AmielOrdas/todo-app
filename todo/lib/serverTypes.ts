@@ -36,16 +36,19 @@ export const ZnewTaskSchemaServer = z.object({
 export const ZloginSchemaServer = z.object({
   email: z.string().email({ message: "Enter a valid email address!" }),
   password: z.string(),
-  confirmPassword: z.string().optional(),
 });
 
-export const ZsignupSchemaServer = ZloginSchemaServer.refine(
-  (value) => value.confirmPassword === value.password,
-  {
+export const ZsignupSchemaServer = z
+  .object({
+    userName: z.string().min(1, { message: "Username is required" }),
+    email: z.string().email({ message: "Enter a valid email address!" }),
+    password: z.string(),
+    confirmPassword: z.string().optional(),
+  })
+  .refine((value) => value.confirmPassword === value.password, {
     message: "Passwords do not match!",
     path: ["confirmPassword"],
-  }
-);
+  });
 
 export const TImage = ["image/jpeg", "image/png", "image/gif"];
 
@@ -63,7 +66,7 @@ export type TdatabaseTaskProps = {
 declare global {
   namespace Express {
     interface Request {
-      user?: { _id: string; email: string };
+      user?: { _id: string; email: string; userName: string };
     }
   }
 }
