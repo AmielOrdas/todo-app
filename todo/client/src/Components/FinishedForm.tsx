@@ -1,67 +1,21 @@
-import { useState, useEffect } from "react";
 import { TmodifiedFinishedTaskProps } from "../../../lib/types";
 import logo from "../assets/logo_fixed.png";
+import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
 export default function PendingForm({
   _id,
   TaskName,
   TaskDeadline,
   TaskDescription,
   ImageData,
-  onPending = () => {
-    return;
-  },
-  onDelete = () => {
-    return;
-  },
+  isPending,
+  onPending,
+  onDelete,
 }: TmodifiedFinishedTaskProps) {
-  // Use Stateful Variables for Editing
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedTaskName, setEditedTaskName] = useState(TaskName);
-  const [editedDeadline, setEditedDeadline] = useState(
-    TaskDeadline.toISOString().slice(0, 16)
-  ); // Datetime-local input
-  const [editedTaskDescription, setEditedTaskDescription] = useState(TaskDescription);
-
-  // useEffect(() => {
-  //   CheckDue(TaskDeadline);
-  //   console.log("USED");
-  // }, [currentDate, TaskDeadline]);
-
-  // useEffect(() => {
-  //   // Update currentDate periodically
-  //   const interval = setInterval(() => {
-  //     setCurrentDate(new Date());
-  //   }, 1000); // Update every second
-
-  //   return () => clearInterval(interval); // Cleanup interval on component unmount
-  // }, []);
-
-  // Check Every Minute - This will be used as flag to compare
-  // const previousMinute = useRef(new Date().getMinutes());
-
-  // const CheckDue = setInterval((TaskDeadline: Date) => {
-  //   const currentDate = new Date();
-  //   const currentMinute = currentDate.getMinutes();
-
-  //   // Verify if a minute has passed
-  //   if (currentMinute !== previousMinute.current) {
-  //     // Update the minute
-  //     previousMinute.current = currentMinute;
-
-  //     // Compare the Dates
-  //     console.log("Current Date: ", currentDate);
-  //     if (currentDate < TaskDeadline) {
-  //       setIsTaskLapsed(false);
-  //     } else {
-  //       setIsTaskLapsed(true);
-  //     }
-  //   }
-  // }, 1000);
-
-  // useEffect(() => {
-  //   return () => clearInterval(CheckDue);
-  // }, []);
-
+  const params = useParams();
+  const [isView, setIsView] = useState(params.taskName ? true : false);
+  const navigate = useNavigate();
+  console.log("Finished");
   // Function to Set a Task into Done
   const HandlePendingTask = async (_id: string) => {
     try {
@@ -115,6 +69,18 @@ export default function PendingForm({
     }
   };
 
+  const HandleViewTask = (_id: string, TaskName: string, isPending: boolean) => {
+    navigate(`/task/${encodeURIComponent(TaskName)}`, {
+      state: { id: _id, isPending: isPending },
+    });
+    setIsView((prevIsView) => !prevIsView);
+  };
+
+  const handleBack = () => {
+    navigate(-1);
+    setIsView((prevIsView) => !prevIsView);
+  };
+
   // Format Date
   const formatDate = (TaskDeadline: Date) => {
     // Retrieve and Format Date & Time
@@ -135,7 +101,7 @@ export default function PendingForm({
 
   return (
     <div
-      className={`min-h-[327px] max-w-[339px] w-full bg-[#09d936] rounded-form-radius`}
+      className={`inline-block min-h-[327px] max-w-[339px] w-full bg-[#09d936] rounded-form-radius`}
     >
       <div>
         <div className="m-4 flex items-start">
@@ -163,23 +129,36 @@ export default function PendingForm({
         </div>
       </div>
 
-      {isEditing || (
-        <div className="m-4 flex justify-start space-x-4">
-          <button
-            onClick={() => HandlePendingTask(_id)}
-            className="bg-button-red p-1 rounded-lg hover:bg-red-900 font-semibold"
-          >
-            Pending
-          </button>
+      <div className="m-4 flex justify-start space-x-4">
+        <button
+          onClick={() => HandlePendingTask(_id)}
+          className="bg-button-red p-1 rounded-lg hover:bg-red-900 font-semibold"
+        >
+          Pending
+        </button>
 
+        <button
+          onClick={() => HandleDeleteTask(_id)}
+          className="bg-button-red p-1 rounded-lg hover:bg-red-900 font-semibold"
+        >
+          Delete
+        </button>
+        {isView ? (
           <button
-            onClick={() => HandleDeleteTask(_id)}
+            onClick={() => handleBack()}
             className="bg-button-red p-1 rounded-lg hover:bg-red-900 font-semibold"
           >
-            Delete
+            Back
           </button>
-        </div>
-      )}
+        ) : (
+          <button
+            onClick={() => HandleViewTask(_id, TaskName, isPending)}
+            className="bg-button-red p-1 rounded-lg hover:bg-red-900 font-semibold"
+          >
+            View
+          </button>
+        )}
+      </div>
     </div>
   );
 }

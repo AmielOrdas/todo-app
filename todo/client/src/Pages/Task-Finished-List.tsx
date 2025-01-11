@@ -35,20 +35,11 @@ export default function TaskFinishedList() {
     // Execute Fetching
     fetchTasks();
   }, []);
-
+  // This function removes the pending task and returns the finished tasks.
   function handleRemove(_id: string) {
     setFinishedTasks((prevFinishedTasks) => {
       const updatedFinishedTasks = prevFinishedTasks.filter(
-        (prevfinishedTask) => prevfinishedTask._id !== _id
-      );
-      return updatedFinishedTasks;
-    });
-  }
-  // This function removes the pending task and returns the finished tasks.
-  function handlePending(_id: string) {
-    setFinishedTasks((prevFinishedTasks) => {
-      const updatedFinishedTasks = prevFinishedTasks.filter(
-        (finishedTasked) => finishedTasked._id !== _id
+        (finishedTask) => finishedTask._id !== _id
       );
       return updatedFinishedTasks;
     });
@@ -79,7 +70,7 @@ export default function TaskFinishedList() {
             <FinishedForm
               key={task._id}
               {...task}
-              onPending={handlePending}
+              onPending={handleRemove}
               onDelete={handleRemove}
             />
           ))}

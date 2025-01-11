@@ -145,13 +145,14 @@ export type collections = {
 // Types for  Pending Task Props
 export const ZTaskSchema = z.object({
   _id: z.string(),
-  TaskName: z.string().min(1, "Task name is required!"),
+  TaskName: z.string(),
   TaskDeadline: z.date(),
-  TaskDescription: z.string().min(1, "A task description must be entered!"),
+  TaskDescription: z.string(),
   ImageName: z.string(),
   ImageData: z.string(),
   isPending: z.boolean(),
 });
+
 export type TtaskProps = z.infer<typeof ZTaskSchema>;
 
 export type TmodifiedPendingTaskProps = TtaskProps & {
@@ -167,7 +168,7 @@ export type TmodifiedPendingTaskProps = TtaskProps & {
 
 export type TmodifiedFinishedTaskProps = TtaskProps & {
   onPending?: (_id: string) => void;
-  onDelete: (_id: string) => void;
+  onDelete?: (_id: string) => void;
 };
 
 // MAKE SCHEMA AND PROPERTIES CONSISTENT THROUGHOUT DIFFERENT PAGES?

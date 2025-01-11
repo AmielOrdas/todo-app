@@ -14,6 +14,16 @@ const assets = multer.memoryStorage();
 
 const upload = multer({ storage: assets });
 
+process.on("uncaughtException", (err) => {
+  console.error("Unhandled error:", err);
+  // Optionally, gracefully shut down the server or restart it
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled promise rejection:", reason);
+  // Optionally, gracefully shut down the server or restart it
+});
+
 router.post(
   "/",
   authenticateUser,
@@ -23,8 +33,7 @@ router.post(
     await connectMongoAtlas();
     const { TaskCollection } = getDBVariables();
     const file = req.file;
-    console.log(file);
-    console.log(req.user);
+
     if (file?.mimetype && !TImage.includes(file.mimetype)) {
       res.status(400).json({
         message: "File must be an image (JPEG, PNG, GIF)",
@@ -63,8 +72,6 @@ router.get("/pending", authenticateUser, async (req: Request, res: Response) => 
       userID,
       isPending: true,
     }).toArray()) as WithId<TdatabaseTaskProps>[];
-
-    console.log(pendingTasks);
 
     const modifiedData = pendingTasks.map((myData: TdatabaseTaskProps) => ({
       _id: myData._id,
@@ -263,6 +270,8 @@ router.put(
           },
         }
       );
+
+      res.status(200).json({ message: "Edit successful" });
     } catch (error) {
       console.error(error);
     }

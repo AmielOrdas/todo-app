@@ -24,11 +24,7 @@ export function validateData(schema: any) {
 }
 
 // Middleware for Authentication
-export const authenticateUser = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const authenticateUser = (req: Request, res: Response, next: NextFunction) => {
   // Get token when token is in authorization header
   // const token = req.headers.authorization?.split(" ")[1];
 

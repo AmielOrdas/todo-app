@@ -1,63 +1,104 @@
 import { useEffect, useState } from "react";
 import { TtaskProps } from "../../../lib/types";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Navigation from "../Components/Navigation";
 import FinishedForm from "../Components/FinishedForm";
 import PendingForm from "../Components/PendingForm";
+
 export default function TaskViewForm() {
-  const { id } = useParams();
-  const [task, setTask] = useState<TtaskProps>();
-  // Fetch Pending Tasks Once Page Mounts
+  const location = useLocation();
+  const taskID = location.state?.id;
+  const taskIsPending = location.state?.isPending;
+  const [task, setTask] = useState<TtaskProps[]>([]);
+  const [taskPending, setTaskPending] = useState<Boolean>(taskIsPending);
+
   useEffect(() => {
     const fetchTask = async () => {
       try {
-        // Fetch from Get ID Route Using a Task Component's ID to Delete Task from Database
-        const response = await fetch(`http://localhost:3000/tasks/${id}`, {
+        const response = await fetch(`http://localhost:3000/tasks/${taskID}`, {
           method: "GET",
           credentials: "include",
         });
         if (!response.ok) {
-          throw new Error("Failed to delete task");
+          throw new Error("Failed to fetch task");
         }
         const data = await response.json();
-
-        const [task] = data.modifiedData;
-        // Convert String Date into Date object
+        const rawTask = data.modifiedData;
         data.modifiedData.forEach(
           (task: TtaskProps) => (task.TaskDeadline = new Date(task.TaskDeadline))
         );
+        const newData = data.modifiedData.map((task: TtaskProps) => ({
+          ...task, // Copy all properties from the task object
+          TaskDeadline: new Date(task.TaskDeadline), // Overwrite TaskDeadline with the new Date
+        }));
 
-        // Update Pending Tasks
-        setTask(task);
+        console.log("useEffect used");
+        setTask(newData);
       } catch (error) {
         console.error(error);
       }
     };
-    // Execute Fetching
+
     fetchTask();
-  }, []);
+  }, [taskPending]);
+  console.log("render");
+  const handleEdit = (
+    _id: string,
+    newTaskName: string,
+    newTaskDeadline: Date,
+    newTaskDescription: string
+  ) => {
+    setTask((prevTasks) =>
+      prevTasks?.map((pendingTask) =>
+        pendingTask._id === _id
+          ? {
+              ...pendingTask,
+              TaskName: newTaskName,
+              TaskDeadline: newTaskDeadline,
+              TaskDescription: newTaskDescription,
+            }
+          : pendingTask
+      )
+    );
+  };
+
+  // Function to remove a pending task when set to done or deleted
+  const handleRemove = (_id: string) => {
+    setTask((prevPendingTasks) => {
+      const updatedPendingTasks = prevPendingTasks.filter(
+        (prevPendingTask) => prevPendingTask._id !== _id
+      );
+
+      return updatedPendingTasks;
+    });
+    setTaskPending((prevTaskPending) => !prevTaskPending);
+  };
 
   return (
     <>
       <Navigation />
-      <main className="min-h-screen bg-background-color-main pt-[5px] flex flex-col">
-        <div className="grid grid-cols-2 grid-rows-2 gap-4 justify-items-center py-4">
-          {task?.isPending ? (
-            <PendingForm key={task._id} {...task} />
-          ) : (
-            <FinishedForm key={task._id} {...task} />
+      <main className="min-h-screen bg-background-color-main pt-[5px]">
+        <div className="text-center my-[200px]">
+          {task.map((task) =>
+            taskPending ? (
+              <PendingForm
+                key={task._id}
+                {...task}
+                onEdit={handleEdit}
+                onDone={handleRemove}
+                onDelete={handleRemove}
+              />
+            ) : (
+              <FinishedForm
+                key={task._id}
+                {...task}
+                onPending={handleRemove}
+                onDelete={handleRemove}
+              />
+            )
           )}
         </div>
       </main>
-      {/*THIS PART SHOULD MOVE IT INTO THE TASK DONE PAGE*/}
-      {/* <h1>DONE TASKS</h1>
-        <div>
-          {pendingTasks
-            .filter((task) => !task.isPending)
-            .map((task) => (
-              <PendingForm key={task.id} {...task} />
-            ))}
-        </div> */}
     </>
   );
 }

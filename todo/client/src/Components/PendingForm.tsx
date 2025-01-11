@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { TmodifiedPendingTaskProps } from "../../../lib/types";
 import logo from "../assets/logo_fixed.png";
 // Remove "Edit" Button for Finished Tasks and Add "Delete" Button
@@ -21,15 +21,10 @@ export default function PendingForm({
   TaskDeadline,
   TaskDescription,
   ImageData,
-  onEdit = () => {
-    return;
-  },
-  onDone = () => {
-    return;
-  },
-  onDelete = () => {
-    return;
-  },
+  isPending,
+  onEdit,
+  onDone,
+  onDelete,
 }: TmodifiedPendingTaskProps) {
   // Use Stateful Variables for Editing
   const [isEditing, setIsEditing] = useState(false);
@@ -40,10 +35,13 @@ export default function PendingForm({
   const [editedTaskDescription, setEditedTaskDescription] = useState(TaskDescription);
   const currentDate = new Date();
   // Stateful Variable for Checking if Task Lapsed
-  const [color, setColor] = useState(
+  const [color, setColor] = useState<String>(
     currentDate < TaskDeadline ? "bg-[#ADA823]" : "bg-[#e83d3d]"
   );
-
+  const params = useParams();
+  console.log(params.taskName);
+  const [isView, setIsView] = useState(params.taskName ? true : false);
+  const navigate = useNavigate();
   // useEffect to check if task lapsed
   useEffect(() => {
     const interval = setInterval(() => {
@@ -199,12 +197,18 @@ export default function PendingForm({
     }
   };
 
-  const HandleViewTask = (_id: string, TaskName: string) => {
-    const navigate = useNavigate();
-    navigate(`/task/${encodeURIComponent(TaskName)}`, { state: { id: _id } });
+  const HandleViewTask = (_id: string, TaskName: string, isPending: boolean) => {
+    navigate(`/task/${encodeURIComponent(TaskName)}`, {
+      state: { id: _id, isPending: isPending },
+    });
+    setIsView((prevIsView) => !prevIsView);
   };
 
-  console.log("Re-render");
+  const handleBack = () => {
+    navigate(-1);
+    setIsView((prevIsView) => !prevIsView);
+  };
+
   // Format Date
   const formatDate = (TaskDeadline: Date) => {
     // Retrieve and Format Date & Time
@@ -225,9 +229,11 @@ export default function PendingForm({
 
     return { formattedDate, formattedTime };
   };
-
+  console.log("Pending");
   return (
-    <div className={`min-h-[327px] max-w-[339px] w-full ${color} rounded-form-radius`}>
+    <div
+      className={`inline-block min-h-[327px] max-w-[339px] w-full ${color} rounded-form-radius`}
+    >
       {isEditing ? (
         <>
           <div className="m-4 flex items-start">
@@ -335,13 +341,21 @@ export default function PendingForm({
           >
             Delete
           </button>
-
-          <button
-            onClick={() => HandleViewTask(_id, TaskName)}
-            className="bg-button-red p-1 rounded-lg hover:bg-red-900 font-semibold"
-          >
-            View
-          </button>
+          {isView ? (
+            <button
+              onClick={() => handleBack()}
+              className="bg-button-red p-1 rounded-lg hover:bg-red-900 font-semibold"
+            >
+              Back
+            </button>
+          ) : (
+            <button
+              onClick={() => HandleViewTask(_id, TaskName, isPending)}
+              className="bg-button-red p-1 rounded-lg hover:bg-red-900 font-semibold"
+            >
+              View
+            </button>
+          )}
         </div>
       )}
     </div>

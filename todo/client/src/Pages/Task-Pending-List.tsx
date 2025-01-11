@@ -25,8 +25,7 @@ export default function TaskPendingList() {
           throw new Error("Failed to fetch pending tasks");
         }
         const data = await response.json();
-        const [XD] = data.modifiedData;
-        console.log("XD: ", XD);
+
         // Convert String Date into Date object
         data.modifiedData.forEach(
           (task: TtaskProps) => (task.TaskDeadline = new Date(task.TaskDeadline))
