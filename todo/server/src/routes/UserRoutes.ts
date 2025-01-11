@@ -15,15 +15,12 @@ dotenv.config({ path: "../.env" });
 
 const router = express.Router();
 
-// console.log("HELLO FROM USER ROUTES");
-
 // LOGIN POST ROUTE
 router.post(
   "/login",
   validateData(ZloginSchemaServer),
   async (req: Request, res: Response) => {
     try {
-      console.log("LOGIN ROUTE");
       // Connect to Database
       await connectMongoAtlas();
       // Get UserCollection
@@ -72,7 +69,6 @@ router.post(
           return res.status(404).json({ error: "User does not exist" });
         }
       }
-      console.log("Received data: ", { email, password });
     } catch (error) {
       if (error instanceof ZodError) {
         return res
@@ -92,7 +88,6 @@ router.post(
   validateData(ZsignupSchemaServer),
   async (req: Request, res: Response) => {
     try {
-      // console.log("HELLO FROM SIGN UP ROUTE");
       // Connect to Database
       await connectMongoAtlas();
       // Get UserCollection
@@ -123,7 +118,6 @@ router.post(
             Status: "Success",
             message: "Account Successfully Created",
           });
-          console.log("RETRIEVED: ", signupData.data, hashPassword);
         }
       }
     } catch (error) {
@@ -162,7 +156,6 @@ router.post("/signout", async (req: Request, res: Response) => {
       path: "/", // Explicit path to match
     });
     res.send({ message: "Successfully Signed out" });
-    console.log("Signout");
   } catch (error) {
     console.error("Unexpected error: ", error);
     return res.status(500).json({ error: "Unexpected error" });

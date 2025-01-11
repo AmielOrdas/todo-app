@@ -35,7 +35,7 @@ export default function TaskPendingList() {
         // Update Pending Tasks
         setPendingTasks(data.modifiedData);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
     // Execute Fetching
@@ -63,46 +63,6 @@ export default function TaskPendingList() {
     );
   };
 
-  // Function to set a pending task into done task
-  // const handleDone = (_id: string) => {
-  //   // This just removes the task from pendingTask page
-
-  //   setPendingTasks((prevPendingTask) =>
-  //     prevPendingTask.map((task) =>
-  //       task._id === _id ? { ...task, isPending: false } : task
-  //     )
-  //   );
-  // };
-
-  // Function to move a pending task into the tasks done
-  // const handleDone = (id: number) => {
-  //   setPendingTasks((prevPendingTasks) => {
-  //     const pendingTaskToDone = prevPendingTasks.find(
-  //       (pendingTask) => pendingTask.id === id
-  //     );
-
-  //     if (pendingTaskToDone) {
-  //       setDoneTasks((prevDoneTasks) => {
-  //         const newDoneTasks = [
-  //           ...prevDoneTasks,
-  //           { ...pendingTaskToDone, id: prevDoneTasks.length + 1 },
-  //         ];
-  //         return newDoneTasks;
-  //       });
-
-  //       // Remove the Task from Pending Tasks then Update IDs
-  //       const updatedPendingTasks = prevPendingTasks.filter(
-  //         (pendingTask) => pendingTask.id !== id
-  //       );
-  //       return updatedPendingTasks.map((pendingTask, index) => ({
-  //         ...pendingTask,
-  //         id: index + 1,
-  //       }));
-  //     }
-  //     return prevPendingTasks;
-  //   });
-  // };
-
   // Function to remove a pending task when set to done or deleted
   const handleRemove = (_id: string) => {
     setPendingTasks((prevPendingTasks) => {
@@ -113,19 +73,15 @@ export default function TaskPendingList() {
     });
   };
 
-  // Filter the Tasks by only applying pagination to Pending Tasks
-  // const currentPendingTasks = pendingTasks.filter((task) => task.isPending);
   // Get total pages
   const totalPages = Math.ceil(pendingTasks.length / tasksPerPage);
+
   // Pagination Logic
   const getPaginatedTasks = () => {
     const startIndex = (currentPage - 1) * tasksPerPage;
     const endIndex = startIndex + tasksPerPage;
     return pendingTasks.slice(startIndex, endIndex);
   };
-  // const startIndex = (currentPage - 1) * tasksPerPage;
-  // const endIndex = startIndex + tasksPerPage;
-  // const currentPendingTasks = pendingTasks.slice(startIndex, endIndex);
 
   // Create Function to Handle Pagination
   const handlePagination = () => {

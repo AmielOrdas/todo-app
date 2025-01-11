@@ -1,7 +1,5 @@
 import express, { Request, Response } from "express";
 import { ZnewTaskSchemaServer, TImage } from "../../../lib/serverTypes";
-import { parse } from "dotenv";
-import { ZodError } from "zod";
 import { validateData, authenticateUser } from "../../../lib/middleware";
 import multer from "multer";
 import { connectMongoAtlas, getDBVariables } from "../database/db";

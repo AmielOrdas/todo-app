@@ -23,7 +23,7 @@ export default function TaskViewForm() {
           throw new Error("Failed to fetch task");
         }
         const data = await response.json();
-        const rawTask = data.modifiedData;
+
         data.modifiedData.forEach(
           (task: TtaskProps) =>
             (task.TaskDeadline = new Date(task.TaskDeadline))
@@ -33,7 +33,6 @@ export default function TaskViewForm() {
           TaskDeadline: new Date(task.TaskDeadline), // Overwrite TaskDeadline with the new Date
         }));
 
-        console.log("useEffect used");
         setTask(newData);
       } catch (error) {
         console.error(error);
@@ -42,7 +41,7 @@ export default function TaskViewForm() {
 
     fetchTask();
   }, [taskPending]);
-  console.log("render");
+
   const handleEdit = (
     _id: string,
     newTaskName: string,

@@ -31,12 +31,13 @@ export default function TaskFinishedList() {
         // Update finished Tasks
         setFinishedTasks(data.modifiedData);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
     // Execute Fetching
     fetchTasks();
   }, []);
+
   // This function removes the pending task and returns the finished tasks.
   function handleRemove(_id: string) {
     setFinishedTasks((prevFinishedTasks) => {

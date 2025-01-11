@@ -1,7 +1,6 @@
-import { useForm, type FieldValues } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useRef } from "react";
 import {
-  TImage,
   TnewTaskSchemaClient,
   ZnewTaskSchemaClient,
   TTaskImage,
@@ -15,10 +14,8 @@ export default function TodoForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    getValues,
     setValue,
     watch,
-    trigger,
   } = useForm<TnewTaskSchemaClient>({
     resolver: zodResolver(ZnewTaskSchemaClient),
   });
@@ -38,33 +35,14 @@ export default function TodoForm() {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/tasks",
-        formData,
-        {
-          withCredentials: true,
-        }
-      );
+      await axios.post("http://localhost:3000/tasks", formData, {
+        withCredentials: true,
+      });
     } catch (error: any) {
       console.error(error.response.data.message);
     }
 
     reset();
-
-    // try {
-    //   const response = await fetch("http://localhost:3000/tasks", {
-    //     method: "POST",
-    //     body: formData,
-    //   }); // Fetch API will return a promise object that contains the HTTP response.
-    //   if (!response.ok) {
-    //     throw new Error("Could not fetch response"); // This will execute when fetching fails
-    //   }
-    //   const messageResponse = await response.json(); // This will convert the body of the HTTP response from JSON to a JavaScript object.
-    // } catch (error) {
-    //   console.error(error);
-    // }
-
-    // reset();
   }
 
   function CheckFileInput(value: TTaskImage) {
@@ -75,7 +53,6 @@ export default function TodoForm() {
       } else if (fileList.length === 0) {
         if (fileRef.current != undefined) {
           setValue("TaskImage", fileRef.current);
-          console.log("Task Image after setting", watch("TaskImage"));
           return "No file chosen";
         }
       }
@@ -155,7 +132,7 @@ export default function TodoForm() {
           type="submit"
           className="text-[12px] bg-button-red w-[64px] h-[25.08px]  disabled:opacity-75"
         >
-          Submit {/*`${isSubmitting}`*/}
+          Submit
         </button>
       </div>
     </form>

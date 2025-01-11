@@ -34,14 +34,9 @@ export default function Login() {
           headers: { "Content-Type": "application/json" },
         }
       );
-      // console.log(response.data.message);
 
       // Template for Varying Output from Server Response
       if (response.data.Status === "Success") {
-        // Get Token
-        // const { token } = await response.data;
-        // // Store token in Local Storage
-        // localStorage.setItem("token", token);
         // Reset
         reset();
         // // Navigate to Todo Page After Account Login
@@ -52,8 +47,6 @@ export default function Login() {
         // Get Status and Error Response
         const status: number = error.response.status;
         const serverErrorMessage: string = error.response.data.error;
-        console.log(status);
-        console.log(serverErrorMessage);
         // Set Whichever Error Received from Server
         if (status === 404) {
           setError("email", { type: "server", message: serverErrorMessage });
@@ -68,26 +61,6 @@ export default function Login() {
       }
     }
   }
-
-  // async function HandleLogin(data: TloginSignupSchema) {
-  //   try {
-  //     // Change url
-  //     const response = await fetch("http://localhost:3000/users/login", {
-  //       method: "POST",
-  //       headers: { "Content-type": "application/json" },
-  //       body: JSON.stringify(data),
-  //     });
-  //     if (!response.ok) {
-  //       throw new Error("Could not fetch response");
-  //     }
-  //     const messageResponse = await response.json();
-  //     console.log(messageResponse.message);
-  //     console.log("Login successful");
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  //   reset();
-  // }
 
   return (
     <main className="min-h-screen bg-background-color-main">

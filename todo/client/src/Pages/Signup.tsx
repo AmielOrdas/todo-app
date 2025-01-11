@@ -32,8 +32,6 @@ export default function Signup() {
         }
       );
 
-      console.log(response.data.message);
-
       if (response.data.Status === "Success") {
         // Reset
         reset();
@@ -41,13 +39,10 @@ export default function Signup() {
         navigateTo("/login");
       }
     } catch (error: any) {
-      // console.log(error.response.data.message);
       if (axios.isAxiosError(error) && error.response) {
         // Get Status and Error Response
         const status: number = error.response.status;
         const serverErrorMessage: string = error.response.data.error;
-        console.log(status);
-        console.log(serverErrorMessage);
         // Set Whichever Error Received from Server
         if (status === 409) {
           setError("email", { type: "server", message: serverErrorMessage });
@@ -60,26 +55,6 @@ export default function Signup() {
       }
     }
   }
-
-  // async function HandleSignup(data: TloginSignupSchema) {
-  //   try {
-  //     // Change url
-  //     const response = await fetch("http://localhost:3000/users/signup", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(data),
-  //     });
-  //     if (!response.ok) {
-  //       throw new Error("Could not fetch response");
-  //     }
-  //     const messageResponse = await response.json();
-  //     console.log(messageResponse.message);
-  //     console.log("Signup successful");
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  //   reset();
-  // }
 
   return (
     <main className="min-h-screen bg-background-color-main">
@@ -114,7 +89,6 @@ export default function Signup() {
                 placeholder="  Enter username"
               />
             </div>{" "}
-            {/*XDD*/}
             <div className="m-4">
               <h1 className="text-lg">
                 Email{" "}
