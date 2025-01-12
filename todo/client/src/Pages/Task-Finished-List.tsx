@@ -8,6 +8,8 @@ export default function TaskFinishedList() {
   const [finishedTasks, setFinishedTasks] = useState<TtaskProps[]>([]);
 
   useEffect(() => {
+    // Set Title Page
+    document.title = "Finished Tasks | Todo";
     async function fetchTasks() {
       try {
         // Set credentials to true for cookie authentication

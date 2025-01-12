@@ -12,6 +12,8 @@ export default function TaskPendingList() {
 
   // Fetch Pending Tasks Once Page Mounts
   useEffect(() => {
+    // Set Title Page
+    document.title = "Pending Tasks | Todo";
     const fetchPendingTasks = async () => {
       try {
         // Set credentials to true for cookie authentication
