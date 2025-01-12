@@ -13,6 +13,11 @@ export default function TaskViewForm() {
   const [taskPending, setTaskPending] = useState<Boolean>(taskIsPending);
 
   useEffect(() => {
+    // Set Title Page based on Path - Replace all %20 with space
+    document.title = `${location.pathname
+      .slice(6)
+      .replace(/%20/g, " ")} Task | Todo`;
+
     const fetchTask = async () => {
       try {
         const response = await fetch(`http://localhost:3000/tasks/${taskID}`, {

@@ -6,6 +6,7 @@ import { TloginSignupSchema, ZloginSchema } from "../../../lib/types";
 import NavigateAuthentication from "../Components/NavigateAuthentication";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function Login() {
   // Setup Schema
@@ -18,6 +19,11 @@ export default function Login() {
   } = useForm<TloginSignupSchema>({
     resolver: zodResolver(ZloginSchema),
   });
+
+  // Apply useEffect to change title page
+  useEffect(() => {
+    document.title = "Login | Todo";
+  }, []);
 
   const navigateTo = useNavigate();
 
