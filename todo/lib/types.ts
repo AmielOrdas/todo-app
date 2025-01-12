@@ -14,12 +14,9 @@ export const ZsignupSchema = z
     email: z
       .string()
       .email("Enter a valid email address!")
-      .refine(
-        (value) => value.endsWith("@gmail.com") || value.endsWith("@yahoo.com"),
-        {
-          message: "Email must be a gmail or yahoo account",
-        }
-      ),
+      .refine((value) => value.endsWith("@gmail.com") || value.endsWith("@yahoo.com"), {
+        message: "Email must be a gmail or yahoo account",
+      }),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters!")
@@ -68,16 +65,21 @@ export const ZnewTaskSchemaClient = z.object({
   }),
   TaskImage: z
     .union([z.instanceof(FileList), z.instanceof(File)])
+    .optional()
     .refine(
       (value) => {
-        if (value instanceof FileList) {
+        // Check if there is no file
+        if (!value) {
+          return true;
+          // Check if the file is a FileList type
+        } else if (value instanceof FileList) {
           const fileList = value;
           if (fileList.length === 0) return true;
           const file = fileList[0];
           return TImage.includes(file.type);
+          // Check if the file is a file type
         } else if (value instanceof File) {
           const file = value;
-          if (!file) return true;
           return TImage.includes(file.type);
         }
       },
@@ -87,6 +89,11 @@ export const ZnewTaskSchemaClient = z.object({
     )
     .refine(
       (value) => {
+        // Check if there is no file
+        if (!value) {
+          return true;
+        }
+        // Check if the file is a FileList type
         if (value instanceof FileList) {
           const fileList = value;
           const file = fileList[0];
@@ -94,7 +101,6 @@ export const ZnewTaskSchemaClient = z.object({
           return file.size < 2 * 1024 ** 2;
         } else if (value instanceof File) {
           const file = value;
-          if (!file) return true;
           return file.size < 2 * 1024 ** 2;
         }
       },
@@ -102,39 +108,9 @@ export const ZnewTaskSchemaClient = z.object({
     ),
 });
 
-export const ZnewTaskSchemaServer = z.object({
-  TaskName: z
-    .string({
-      invalid_type_error: "Task Name must be a string",
-    })
-    .min(1, {
-      message: "Task Name is required",
-    })
-    .refine((value) => value.trim().length > 0, {
-      message: "Task Name cannot be blank",
-    }),
-
-  TaskDeadline: z
-    .string({ required_error: "Task Deadline must be a string" })
-    .min(1, { message: "Task Deadline is required" })
-    .refine(
-      (value) => {
-        const date = new Date(value);
-        date.setHours(23, 59, 59, 59);
-        return date >= new Date();
-      },
-      { message: "Task Deadline must be in the future" }
-    ),
-  TaskDescription: z.string({
-    invalid_type_error: "Task Description must be a string",
-  }),
-});
-
 export type TloginSignupSchema = z.infer<typeof ZloginSchema>;
 
 export type TnewTaskSchemaClient = z.infer<typeof ZnewTaskSchemaClient>;
-
-export type TnewTaskSchemaServer = z.infer<typeof ZnewTaskSchemaServer>;
 
 export type TTaskImage = FileList | File | undefined;
 

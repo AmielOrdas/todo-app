@@ -1,45 +1,55 @@
 import express, { Request, Response } from "express";
 import { ZnewTaskSchemaServer, TImage } from "../../../lib/serverTypes";
 import { validateData, authenticateUser } from "../../../lib/middleware";
-import multer from "multer";
+import multer from "multer"; // This is a middleware for processing files coming from multipart/form-data
 import { connectMongoAtlas, getDBVariables } from "../database/db";
 import { ObjectId, WithId } from "mongodb";
-
 import { TdatabaseTaskProps } from "../../../lib/serverTypes";
+
 const router = express.Router();
 
+// The files are saved to memoryStorage for temporary storing of files
 const assets = multer.memoryStorage();
 
 const upload = multer({ storage: assets });
 
-process.on("uncaughtException", (err) => {
-  console.error("Unhandled error:", err);
-  // Optionally, gracefully shut down the server or restart it
-});
+// This function is to rename the key naming convention in the server to suit the key naming convention of in the client-side.
+function modifyData(rawData: WithId<TdatabaseTaskProps>[]) {
+  const modifiedData = rawData.map((rawData: TdatabaseTaskProps) => ({
+    _id: rawData._id,
+    TaskName: rawData.name,
+    TaskDeadline: rawData.deadline,
+    TaskDescription: rawData.description,
+    ImageName: rawData.imageName,
+    ImageData: rawData.imageData,
+    isPending: rawData.isPending,
+  }));
+  return modifiedData;
+}
 
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled promise rejection:", reason);
-  // Optionally, gracefully shut down the server or restart it
-});
-
+// This route is responsible for processing submitted multipart/form-data from the client.
 router.post(
   "/",
   authenticateUser,
-  upload.single("TaskImage"),
+  upload.single("TaskImage"), // Upload the file passed from the "TaskImage" field in assets
   validateData(ZnewTaskSchemaServer),
   async (req: Request, res: Response) => {
     await connectMongoAtlas();
     const { TaskCollection } = getDBVariables();
+    // Get the file from the request
     const file = req.file;
+    // Check if a file exists and if the file type is JPEG/PNG/GIF
 
-    if (file?.mimetype && !TImage.includes(file.mimetype)) {
+    if (file && !TImage.includes(file.mimetype)) {
       res.status(400).json({
         message: "File must be an image (JPEG, PNG, GIF)",
       });
-    } else if (file?.mimetype && !(file.size < 2 * 1024 ** 2)) {
+      // Check if the file exists and if the file size is greater than 2 mb.
+    } else if (file && file.size >= 2 * 1024 ** 2) {
       res.status(400).json({
         message: "File size must be less than 2 mb",
       });
+      // "else" happens if the file exists, the file is a type of JPEG/PNG/GIF and the file size is less than 2 mb
     } else {
       await TaskCollection.insertOne({
         name: req.body.TaskName,
@@ -57,102 +67,82 @@ router.post(
   }
 );
 
-router.get(
-  "/pending",
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    try {
-      // Connect to Database
-      await connectMongoAtlas();
-      // Get TaskCollection
-      const { TaskCollection } = getDBVariables();
-      // Get userID and userName from cookie's token
-      const userID = req.user?._id;
-      const userName = req.user?.userName;
-      // Fetch all pending tasks from database using userID as key - Convert Cursor to Array
-      const pendingTasks = (await TaskCollection.find({
-        userID,
-        isPending: true,
-      }).toArray()) as WithId<TdatabaseTaskProps>[];
+// This route is responsible for retrieving the pending tasks
+router.get("/pending", authenticateUser, async (req: Request, res: Response) => {
+  try {
+    // Connect to Database
+    await connectMongoAtlas();
+    // Get TaskCollection
+    const { TaskCollection } = getDBVariables();
+    // Get userID and userName from cookie's token
+    const userID = req.user?._id;
+    const userName = req.user?.userName;
+    // Fetch all pending tasks from database using userID as key - Convert Cursor (a data type in mongoDB) to Array
+    const pendingTasks = (await TaskCollection.find({
+      userID,
+      isPending: true,
+    }).toArray()) as WithId<TdatabaseTaskProps>[]; // This tells typescript that pendingTasks is 100% a type of WithId<TdatabaseTaskProps>[].
 
-      const modifiedData = pendingTasks.map((myData: TdatabaseTaskProps) => ({
-        _id: myData._id,
-        TaskName: myData.name,
-        TaskDeadline: myData.deadline,
-        TaskDescription: myData.description,
-        ImageName: myData.imageName,
-        ImageData: myData.imageData,
-        isPending: myData.isPending,
-      }));
+    // Use modifyData function to rename the keys.
+    const modifiedData = modifyData(pendingTasks);
 
-      if (pendingTasks.length === 0) {
-        return res.status(404).json({
-          pendingTasks: [],
-          userName,
-          message: "User has no pending tasks",
-        });
-      } else {
-        return res.status(200).json({
-          modifiedData,
-          userName,
-          message: "Successfully fetched pending tasks",
-        });
-      }
-    } catch (error) {
-      console.error(error);
+    if (pendingTasks.length === 0) {
+      return res.status(404).json({
+        pendingTasks: [],
+        userName,
+        message: "User has no pending tasks",
+      });
+    } else {
+      return res.status(200).json({
+        modifiedData,
+        userName,
+        message: "Successfully fetched pending tasks",
+      });
     }
+  } catch (error) {
+    console.error(error);
   }
-);
+});
+// This route is responsible for retrieving the finished tasks
+router.get("/finished", authenticateUser, async (req: Request, res: Response) => {
+  try {
+    // Connect to Database
+    await connectMongoAtlas();
+    // Get TaskCollection
+    const { TaskCollection } = getDBVariables();
+    // Get userID and userName from cookie's token
+    const userID = req.user?._id;
+    const userName = req.user?.userName;
+    // Fetch all pending tasks from database using userID as key - Convert Cursor (a data type in mongoDB) to Array
+    const pendingTasks = (await TaskCollection.find({
+      userID,
+      isPending: false,
+    }).toArray()) as WithId<TdatabaseTaskProps>[]; // This tells typescript that pendingTasks is 100% a type of WithId<TdatabaseTaskProps>[].
 
-router.get(
-  "/finished",
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    try {
-      // Connect to Database
-      await connectMongoAtlas();
-      // Get TaskCollection
-      const { TaskCollection } = getDBVariables();
-      // Get userID and userName from cookie's token
-      const userID = req.user?._id;
-      const userName = req.user?.userName;
-      // Fetch all pending tasks from database using userID as key - Convert Cursor to Array
-      const pendingTasks = (await TaskCollection.find({
-        userID,
-        isPending: false,
-      }).toArray()) as WithId<TdatabaseTaskProps>[];
+    // Use modifyData function to rename the keys.
+    const modifiedData = modifyData(pendingTasks);
 
-      const modifiedData = pendingTasks.map((myData: TdatabaseTaskProps) => ({
-        _id: myData._id,
-        TaskName: myData.name,
-        TaskDeadline: myData.deadline,
-        TaskDescription: myData.description,
-        ImageName: myData.imageName,
-        ImageData: myData.imageData,
-        isPending: myData.isPending,
-      }));
-
-      if (pendingTasks.length === 0) {
-        return res.status(404).json({
-          finishedTasks: [],
-          userName,
-          message: "User has no finished tasks",
-        });
-      } else {
-        return res.status(200).json({
-          modifiedData,
-          userName,
-          message: "Successfully fetched pending tasks",
-        });
-      }
-    } catch (error) {
-      console.error(error);
+    if (pendingTasks.length === 0) {
+      return res.status(404).json({
+        finishedTasks: [],
+        userName,
+        message: "User has no finished tasks",
+      });
+    } else {
+      return res.status(200).json({
+        modifiedData,
+        userName,
+        message: "Successfully fetched pending tasks",
+      });
     }
+  } catch (error) {
+    console.error(error);
   }
-);
+});
 
 router
   .route("/:id")
+  // This route is responsible for retrieving the a task
   .get(authenticateUser, async (req: Request, res: Response) => {
     // Retrieve ID and Key/Value Pairs
     const { id } = req.params;
@@ -171,17 +161,10 @@ router
       const task = (await TaskCollection.find({
         userID,
         _id: new ObjectId(id),
-      }).toArray()) as WithId<TdatabaseTaskProps>[];
+      }).toArray()) as WithId<TdatabaseTaskProps>[]; // This tells typescript that pendingTasks is 100% a type of WithId<TdatabaseTaskProps>[].
 
-      const modifiedData = task.map((myData: TdatabaseTaskProps) => ({
-        _id: myData._id,
-        TaskName: myData.name,
-        TaskDeadline: myData.deadline,
-        TaskDescription: myData.description,
-        ImageName: myData.imageName,
-        ImageData: myData.imageData,
-        isPending: myData.isPending,
-      }));
+      // Use modifyData function to rename the keys.
+      const modifiedData = modifyData(task);
 
       if (task.length === 0) {
         return res.status(404).json({
@@ -200,6 +183,7 @@ router
       console.error(error);
     }
   })
+  // This route is responsible for editing a task
   .put(authenticateUser, async (req: Request, res: Response) => {
     // Retrieve ID and Key/Value Pairs
     const { id } = req.params;
@@ -236,6 +220,7 @@ router
       console.error(error);
     }
   })
+  // This route is responsible for deleting a task
   .delete(authenticateUser, async (req: Request, res: Response) => {
     // Retrieve Task ID
     const { id } = req.params;
@@ -265,6 +250,7 @@ router
     }
   });
 
+// This route is responsible for modifying the "isPending" field of a task.
 router.put(
   "/:id/ModifyIsPending",
   authenticateUser,
