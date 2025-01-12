@@ -26,8 +26,7 @@ export default function TaskFinishedList() {
 
         // Convert String Date into Date object
         data.modifiedData.forEach(
-          (task: TtaskProps) =>
-            (task.TaskDeadline = new Date(task.TaskDeadline))
+          (task: TtaskProps) => (task.TaskDeadline = new Date(task.TaskDeadline))
         );
 
         // Update finished Tasks

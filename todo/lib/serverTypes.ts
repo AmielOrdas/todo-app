@@ -47,7 +47,7 @@ export const ZsignupSchemaServer = z
     message: "Passwords do not match!",
     path: ["confirmPassword"],
   });
-
+// This type is created for image file type validation
 export const TImage = ["image/jpeg", "image/png", "image/gif"];
 
 export type TdatabaseTaskProps = {
@@ -60,7 +60,7 @@ export type TdatabaseTaskProps = {
   isPending: boolean;
   userID: string;
 };
-
+// Put "user" in Request so that "req.user" is possible.
 declare global {
   namespace Express {
     interface Request {

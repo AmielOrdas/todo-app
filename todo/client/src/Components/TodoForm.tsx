@@ -1,12 +1,13 @@
-import { useForm } from "react-hook-form";
-import { useRef } from "react";
+import { useForm } from "react-hook-form"; // react-hook-form is a library used to create forms easily.
+import { useEffect, useRef } from "react";
 import {
   TnewTaskSchemaClient,
   ZnewTaskSchemaClient,
   TTaskImage,
 } from "../../../lib/types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
+
+import { zodResolver } from "@hookform/resolvers/zod"; // zodResolver is used to connect the zod schema and the react-hook-form
+import axios from "axios"; // Axios is a HTTP request library
 
 export default function TodoForm() {
   const {
@@ -14,56 +15,54 @@ export default function TodoForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    setValue,
     watch,
+    trigger,
+    resetField,
   } = useForm<TnewTaskSchemaClient>({
-    resolver: zodResolver(ZnewTaskSchemaClient),
+    resolver: zodResolver(ZnewTaskSchemaClient), // This means that useForm will use the newTaskSchemaClient zod schema to validate the form data.
   });
-  const fileRef = useRef<TTaskImage>(undefined);
+  const previousError = useRef<string | undefined>(undefined);
+  // const [taskImage, setTaskImage] = useState<TTaskImage>(undefined)
   const taskImage: TTaskImage = watch("TaskImage");
 
   async function SubmitData(data: TnewTaskSchemaClient) {
-    const formData = new FormData();
+    const formData = new FormData(); // This line of code allows us to send files to the server. Without this, we can only send string or numerical values (text, dates, age, email)
+
+    // Attach the form data of the user to the formData variable.
     formData.append("TaskName", data.TaskName);
     formData.append("TaskDeadline", data.TaskDeadline);
     formData.append("TaskDescription", data.TaskDescription);
 
+    // Check if the file is only a single file
     if (data.TaskImage instanceof File) {
       formData.append("TaskImage", data.TaskImage);
+      // Check if the file is an array containing files
     } else if (data.TaskImage instanceof FileList) {
-      formData.append("TaskImage", data.TaskImage[0]);
+      formData.append("TaskImage", data.TaskImage[0]); // Attach the first file only because we only asked one single image.
     }
 
     try {
       await axios.post("http://localhost:3000/tasks", formData, {
         withCredentials: true,
       });
+      alert("Successfully submitted");
     } catch (error: any) {
+      alert(`Server error`);
       console.error(error.response.data.message);
     }
-
     reset();
   }
 
-  function CheckFileInput(value: TTaskImage) {
-    if (value instanceof FileList) {
-      const fileList: FileList = value;
-      if (fileList.length > 0) {
-        return fileList[0].name;
-      } else if (fileList.length === 0) {
-        if (fileRef.current != undefined) {
-          setValue("TaskImage", fileRef.current);
-          return "No file chosen";
-        }
-      }
-    } else if (value instanceof File) {
-      const file: File = value;
+  useEffect(() => {
+    if (errors.TaskImage) {
+      previousError.current = errors.TaskImage.message; // Put the current error in the ref variable
 
-      return file.name;
-    } else if (!value) {
-      return "No file chosen";
+      resetField("TaskImage"); // Reset the file input but not the error.
+      trigger("TaskImage"); // Revalidate the input
+    } else if (!errors.TaskImage && previousError.current) {
+      previousError.current = ""; // Clear the previous error
     }
-  }
+  }, [errors.TaskImage]);
 
   return (
     <form
@@ -112,11 +111,25 @@ export default function TodoForm() {
         />
       </div>
 
-      <div className="w-[190px] ml-[37px] text-left text-xs">
-        {errors.TaskImage ? (
-          <p className="text-red-600">{errors.TaskImage.message}</p>
+      <div className="w-[300px] ml-[37px] text-left text-xs">
+        {/*Check if its a single file */}
+        {taskImage instanceof File && <p>{taskImage.name}</p>}
+        {/*Check if its multiple files */}
+        {taskImage instanceof FileList && taskImage.length > 0 && (
+          <p>{taskImage[0].name}</p>
+        )}
+        {/*Check if file exists */}
+        {!taskImage && !previousError.current ? (
+          <p>No file selected</p>
         ) : (
-          <p>{CheckFileInput(taskImage)}</p>
+          <>
+            {/* Show error message if there's an error */}
+            {previousError.current && (
+              <p className="inline text-red-600 italic">
+                {`Please select the correct file (${previousError.current})`}
+              </p>
+            )}
+          </>
         )}
       </div>
 
