@@ -49,7 +49,7 @@ router.post(
               );
               // Set Cookie
               res.cookie("token", token, {
-                httpOnly: true,
+                httpOnly: false, // Set to false to allow javascript access
                 secure: false,
                 sameSite: "strict",
                 path: "/", // Explicit path

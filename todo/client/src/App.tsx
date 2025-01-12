@@ -7,6 +7,7 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import "./index.css";
 import { useEffect } from "react";
 import SignUp from "./Pages/Signup";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 function DummyPage() {
   const navigate = useNavigate();
@@ -22,12 +23,40 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<DummyPage />} />
-      <Route path="/Todo" element={<Todo />} />
+      <Route
+        path="/Todo"
+        element={
+          <ProtectedRoute>
+            <Todo />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/login" element={<Login />} />
-      <Route path="/pending-tasks" element={<TaskPendingList />} />
-      <Route path="/finished-tasks" element={<TaskFinishedList />} />
+      <Route
+        path="/pending-tasks"
+        element={
+          <ProtectedRoute>
+            <TaskPendingList />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/finished-tasks"
+        element={
+          <ProtectedRoute>
+            <TaskFinishedList />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/task/:taskName" element={<TaskViewForm />} />
+      <Route
+        path="/task/:taskName"
+        element={
+          <ProtectedRoute>
+            <TaskViewForm />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
