@@ -24,7 +24,6 @@ export default function TaskFinishedList() {
         }
 
         const data = await response.json();
-        console.log(data);
 
         // Validate the data coming from the server using the newTaskSchemaClient zod schema
         data.modifiedData.forEach((task: TtaskProps) => {
