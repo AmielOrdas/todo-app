@@ -10,15 +10,16 @@ const PORT = 3000;
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
+    origin: ["http://localhost:5173"], // Allows http://localhost:5173 to interact with the server.
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allows these HTTP requests to interact with the server.
+    credentials: true, // Includes the cookies or any other authorization keys in the HTTP payload.
   })
 );
-app.use(express.json());
+app.use(express.json()); // Parses JSON data from incoming HTTP requests.
 
-app.use(cookieParser());
+app.use(cookieParser()); // Parses HTTP cookies from incoming HTTP requests.
 
+// This function that connects to mongoDB Atlas
 (async () => {
   try {
     await connectMongoAtlas();

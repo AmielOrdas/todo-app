@@ -8,6 +8,7 @@ import "./index.css";
 import { useEffect } from "react";
 import SignUp from "./Pages/Signup";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import NotFound from "./Pages/NotFound";
 
 function DummyPage() {
   const navigate = useNavigate();
@@ -22,11 +23,15 @@ function DummyPage() {
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<DummyPage />} />
+      {/*Directs to login page when root route is accessed */}
+      <Route path="/" element={<DummyPage />} />{" "}
+      {/*Directs to not found page when path does not exist */}
+      <Route path="*" element={<NotFound />} />
       <Route
         path="/Todo"
         element={
           <ProtectedRoute>
+            {/*Directs to Todo page when authorized (token present in cookies) */}
             <Todo />
           </ProtectedRoute>
         }
@@ -36,6 +41,7 @@ function App() {
         path="/pending-tasks"
         element={
           <ProtectedRoute>
+            {/*Directs to TaskPending page when authorized (token present in cookies) */}
             <TaskPendingList />
           </ProtectedRoute>
         }
@@ -44,6 +50,7 @@ function App() {
         path="/finished-tasks"
         element={
           <ProtectedRoute>
+            {/*Directs to Task Finished Page when authorized (token present in cookies) */}
             <TaskFinishedList />
           </ProtectedRoute>
         }
@@ -53,6 +60,7 @@ function App() {
         path="/task/:taskName"
         element={
           <ProtectedRoute>
+            {/*Directs to Task View Form Page when authorized (token present in cookies) */}
             <TaskViewForm />
           </ProtectedRoute>
         }

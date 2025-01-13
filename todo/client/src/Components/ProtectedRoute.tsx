@@ -6,7 +6,7 @@ export default function ProtectedRoute({
   children,
 }: {
   children: React.ReactNode;
-}): JSX.Element | null {
+}): React.ReactNode | null {
   const navigateTo = useNavigate();
 
   useEffect(() => {
@@ -14,11 +14,11 @@ export default function ProtectedRoute({
     const token = Cookies.get("token");
     // Navigate to Login Page if no token in cookies
     if (!token) {
-      navigateTo("/login");
+      navigateTo("/NotFound");
     }
   }, [navigateTo]);
 
   const token = Cookies.get("token");
-
-  return token ? <>{children}</> : null;
+  // If there is no token then return null. Otherwise, return the page
+  return token ? children : null;
 }

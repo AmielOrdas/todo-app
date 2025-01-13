@@ -22,7 +22,7 @@ export default function TodoForm() {
     resolver: zodResolver(ZnewTaskSchemaClient), // This means that useForm will use the newTaskSchemaClient zod schema to validate the form data.
   });
   const previousError = useRef<string | undefined>(undefined);
-  // const [taskImage, setTaskImage] = useState<TTaskImage>(undefined)
+
   const taskImage: TTaskImage = watch("TaskImage");
 
   async function SubmitData(data: TnewTaskSchemaClient) {

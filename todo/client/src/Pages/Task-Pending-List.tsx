@@ -3,7 +3,7 @@ import { TtaskProps } from "../../../lib/types";
 import Navigation from "../Components/Navigation";
 import PendingForm from "../Components/PendingForm";
 import "../index.css";
-
+import { ZnewTaskSchemaClient } from "../../../lib/types";
 export default function TaskPendingList() {
   // Make the Props Dynamic by Stateful Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,12 +27,16 @@ export default function TaskPendingList() {
         if (!response.ok) {
           throw new Error("Failed to fetch pending tasks");
         }
-
-        // Convert String Date into Date object
-        data.modifiedData.forEach(
-          (task: TtaskProps) =>
-            (task.TaskDeadline = new Date(task.TaskDeadline))
-        );
+        data.modifiedData.forEach((task: TtaskProps) => {
+          // Validate the data coming from the server using the newTaskSchemaClient zod schema
+          const parseResult = ZnewTaskSchemaClient.safeParse(task);
+          if (!parseResult.success) {
+            throw new Error("Incorrect data");
+          } else {
+            // Convert String Date into Date object
+            task.TaskDeadline = new Date(task.TaskDeadline);
+          }
+        });
 
         // Update Pending Tasks
         setPendingTasks(data.modifiedData);

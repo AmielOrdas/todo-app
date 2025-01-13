@@ -33,13 +33,9 @@ export default function Login() {
   // Handle Login Submission to Server
   async function HandleLogin(data: TloginSignupSchema) {
     try {
-      const response = await axios.post(
-        "http://localhost:3000/users/login",
-        data,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const response = await axios.post("http://localhost:3000/users/login", data, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       // Template for Varying Output from Server Response
       if (response.data.Status === "Success") {
@@ -53,16 +49,14 @@ export default function Login() {
         // Get Status and Error Response
         const status: number = error.response.status;
         const serverErrorMessage: string = error.response.data.error;
-        // Set Whichever Error Received from Server
+        // Set Whichever Error Received from Server ( 401 and 404 are from server)
         if (status === 404) {
           setError("email", { type: "server", message: serverErrorMessage });
         } else if (status === 401) {
           setError("password", { type: "server", message: serverErrorMessage });
+          // Error from axios
         } else {
-          setError("root", {
-            type: "server",
-            message: "Unexpected error occurred",
-          });
+          console.error("Unexpected error occurred");
         }
       }
     }
@@ -79,9 +73,7 @@ export default function Login() {
       </div>
       <div className="mt-8">
         <div className="min-h-auto max-w-[421px] bg-form-color rounded-form-radius mx-auto my-auto border-black border-2">
-          <h1 className="text-center pt-2 text-2xl font-semibold">
-            Login Account
-          </h1>
+          <h1 className="text-center pt-2 text-2xl font-semibold">Login Account</h1>
           <form onSubmit={handleSubmit(HandleLogin)}>
             <div className="m-4">
               <h1 className="text-lg">

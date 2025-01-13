@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import Navigation from "../Components/Navigation";
 import FinishedForm from "../Components/FinishedForm";
 import PendingForm from "../Components/PendingForm";
-
+import { ZnewTaskSchemaClient } from "../../../lib/types";
 export default function TaskViewForm() {
   const location = useLocation();
   const taskID = location.state?.id;
@@ -14,9 +14,7 @@ export default function TaskViewForm() {
 
   useEffect(() => {
     // Set Title Page based on Path - Replace all %20 with space
-    document.title = `${location.pathname
-      .slice(6)
-      .replace(/%20/g, " ")} Task | Todo`;
+    document.title = `${location.pathname.slice(6).replace(/%20/g, " ")} Task | Todo`;
 
     const fetchTask = async () => {
       try {
@@ -29,16 +27,18 @@ export default function TaskViewForm() {
         }
         const data = await response.json();
 
-        data.modifiedData.forEach(
-          (task: TtaskProps) =>
-            (task.TaskDeadline = new Date(task.TaskDeadline))
-        );
-        const newData = data.modifiedData.map((task: TtaskProps) => ({
-          ...task, // Copy all properties from the task object
-          TaskDeadline: new Date(task.TaskDeadline), // Overwrite TaskDeadline with the new Date
-        }));
+        data.modifiedData.forEach((task: TtaskProps) => {
+          // Validate the data coming from the server using the newTaskSchemaClient zod schema
+          const parseResult = ZnewTaskSchemaClient.safeParse(task);
+          if (!parseResult.success) {
+            throw new Error("Incorrect data");
+          } else {
+            // Convert String Date into Date object
+            task.TaskDeadline = new Date(task.TaskDeadline);
+          }
+        });
 
-        setTask(newData);
+        setTask(data.modifiedData);
       } catch (error) {
         console.error(error);
       }
