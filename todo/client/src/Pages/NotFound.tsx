@@ -1,5 +1,3 @@
-import React from "react";
-import Navigation from "../Components/Navigation";
 import logo from "../assets/logo_fixed.png";
 export default function NotFound() {
   document.title = "404 Not Found";
