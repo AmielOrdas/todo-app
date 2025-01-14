@@ -7,7 +7,7 @@ import NavigateAuthentication from "../Components/NavigateAuthentication";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-
+import Cookies from "js-cookie";
 export default function Signup() {
   // Setup Schema
   const {
@@ -23,6 +23,11 @@ export default function Signup() {
   // Apply useEffect to change title page
   useEffect(() => {
     document.title = "Sign Up | Todo";
+    const token = Cookies.get("token");
+    // Navigate to Login Page if no token in cookies
+    if (token) {
+      navigateTo("/Todo");
+    }
   }, []);
 
   const navigateTo = useNavigate();
@@ -30,13 +35,9 @@ export default function Signup() {
   // Handle Sign Up Submission to Server After Validation
   async function HandleSignup(data: TloginSignupSchema) {
     try {
-      const response = await axios.post(
-        "http://localhost:3000/users/signup",
-        data,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const response = await axios.post("http://localhost:3000/users/signup", data, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       if (response.data.Status === "Success") {
         // Reset
@@ -73,9 +74,7 @@ export default function Signup() {
       </div>
       <div className="mt-8">
         <div className="min-h-auto max-w-[421px] bg-form-color rounded-form-radius mx-auto my-auto border-black border-2">
-          <h1 className="text-center pt-2 text-2xl font-semibold">
-            Sign Up Account
-          </h1>
+          <h1 className="text-center pt-2 text-2xl font-semibold">Sign Up Account</h1>
           <form onSubmit={handleSubmit(HandleSignup)}>
             <div className="m-4">
               <h1 className="text-lg">

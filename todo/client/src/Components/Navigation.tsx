@@ -49,10 +49,10 @@ export default function Navigation() {
   return (
     <header className="bg-nav-bar-color p-2">
       <nav className="flex justify-between">
-        <img src={logo} className="xl:ml-[150px] lg:size-20 sm:size-40" />
-        <h1 className="font-bold m-auto text-white text-[24px]">
-          {displayName}
-        </h1>
+        <div className="flex">
+          <img src={logo} className="xl:ml-[150px] lg:size-20 sm:size-40 mr-5" />
+          <h1 className="font-bold m-auto text-white text-[24px]">{displayName}</h1>
+        </div>
         <div className="lg:flex justify-between items-center">
           <ul className="lg:flex justify-between items-center">
             <li className="hover:bg-[#441D1D] text-[24px] text-nav-bar-font-color px-8 max-lg: py-1 hover:font-bold">

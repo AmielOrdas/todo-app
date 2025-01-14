@@ -7,7 +7,7 @@ import NavigateAuthentication from "../Components/NavigateAuthentication";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-
+import Cookies from "js-cookie";
 export default function Login() {
   // Setup Schema
   const {
@@ -23,6 +23,12 @@ export default function Login() {
   // Apply useEffect to change title page
   useEffect(() => {
     document.title = "Login | Todo";
+    // Retrieve Token from Cookies
+    const token = Cookies.get("token");
+    // Navigate to Login Page if no token in cookies
+    if (token) {
+      navigateTo("/Todo");
+    }
   }, []);
 
   const navigateTo = useNavigate();

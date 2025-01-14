@@ -9,12 +9,19 @@ import { useEffect } from "react";
 import SignUp from "./Pages/Signup";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import NotFound from "./Pages/NotFound";
-
+import Cookies from "js-cookie";
 function DummyPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate("/Login");
+    // Retrieve Token from Cookies
+    const token = Cookies.get("token");
+    // Navigate to Login Page if no token in cookies
+    if (token) {
+      navigate("/Todo");
+    } else {
+      navigate("/Login");
+    }
   }, [navigate]);
 
   return <h1>Redirecting to login page</h1>;

@@ -82,7 +82,7 @@ router.get("/pending", authenticateUser, async (req: Request, res: Response) => 
       userID,
       isPending: true,
     }).toArray()) as WithId<TdatabaseTaskProps>[]; // This tells typescript that pendingTasks is 100% a type of WithId<TdatabaseTaskProps>[].
-
+    console.log(pendingTasks);
     // Use modifyData function to rename the keys.
     const modifiedData = modifyData(pendingTasks);
 
