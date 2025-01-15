@@ -4,7 +4,7 @@ import Navigation from "../Components/Navigation";
 import PendingForm from "../Components/PendingForm";
 import "../index.css";
 import { ZnewTaskSchemaClient } from "../../../lib/types";
-export default function TaskPendingList() {
+export default function TaskPendingPage() {
   // Make the Props Dynamic by Stateful Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const tasksPerPage = 4;

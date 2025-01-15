@@ -5,7 +5,7 @@ import Navigation from "../Components/Navigation";
 import FinishedForm from "../Components/FinishedForm";
 import PendingForm from "../Components/PendingForm";
 import { ZnewTaskSchemaClient } from "../../../lib/types";
-export default function TaskViewForm() {
+export default function TaskViewPage() {
   const location = useLocation();
   const taskID = location.state?.id;
   const taskIsPending = location.state?.isPending;

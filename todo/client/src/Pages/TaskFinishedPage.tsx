@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { TtaskProps } from "../../../lib/types";
 import FinishedForm from "../Components/FinishedForm";
 import { ZnewTaskSchemaClient } from "../../../lib/types";
-export default function TaskFinishedList() {
+export default function TaskFinishedPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const tasksPerPage = 4;
   const [finishedTasks, setFinishedTasks] = useState<TtaskProps[]>([]);
@@ -11,7 +11,7 @@ export default function TaskFinishedList() {
   useEffect(() => {
     // Set Title Page
     document.title = "Finished Tasks | Todo";
-    async function fetchTasks() {
+    (async function fetchFinishedTasks() {
       try {
         // Set credentials to true for cookie authentication
         const response = await fetch("http://localhost:3000/tasks/finished", {
@@ -41,9 +41,8 @@ export default function TaskFinishedList() {
       } catch (error) {
         console.error(error);
       }
-    }
+    })();
     // Execute Fetching
-    fetchTasks();
   }, []);
 
   // This function removes the pending task and returns the finished tasks.

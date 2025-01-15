@@ -1,8 +1,8 @@
 import Todo from "./Pages/Todo";
 import Login from "./Pages/Login";
-import TaskFinishedList from "./Pages/Task-Finished-List";
-import TaskPendingList from "./Pages/Task-Pending-List";
-import TaskViewForm from "./Pages/Task-View-Form";
+import TaskFinishedPage from "./Pages/TaskFinishedPage";
+import TaskPendingPage from "./Pages/TaskPendingPage";
+import TaskViewPage from "./Pages/TaskViewPage";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "./index.css";
 import { useEffect } from "react";
@@ -49,7 +49,7 @@ function App() {
         element={
           <ProtectedRoute>
             {/*Directs to TaskPending page when authorized (token present in cookies) */}
-            <TaskPendingList />
+            <TaskPendingPage />
           </ProtectedRoute>
         }
       />
@@ -58,7 +58,7 @@ function App() {
         element={
           <ProtectedRoute>
             {/*Directs to Task Finished Page when authorized (token present in cookies) */}
-            <TaskFinishedList />
+            <TaskFinishedPage />
           </ProtectedRoute>
         }
       />
@@ -68,7 +68,7 @@ function App() {
         element={
           <ProtectedRoute>
             {/*Directs to Task View Form Page when authorized (token present in cookies) */}
-            <TaskViewForm />
+            <TaskViewPage />
           </ProtectedRoute>
         }
       />
