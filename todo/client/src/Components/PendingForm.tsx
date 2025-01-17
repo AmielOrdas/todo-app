@@ -3,6 +3,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import { TmodifiedPendingTaskProps } from "../../../lib/types";
 import logo from "../assets/logo_fixed.png";
 
+/*
+PHT
+Deadline - 8 am
+Current - 5 am
+
+Duration: 3 hours
+
+US
+
+Deadline - 6pm
+Current - 3pm
+
+*/
 export default function PendingForm({
   _id,
   TaskName,
@@ -17,8 +30,8 @@ export default function PendingForm({
   // Use Stateful Variables for Editing
   const [isEditing, setIsEditing] = useState(false);
   const [editedTaskName, setEditedTaskName] = useState(TaskName);
-  const [editedDeadline, setEditedDeadline] = useState(
-    TaskDeadline.toISOString().slice(0, 16)
+  const [editedTaskDeadline, setEditedTaskDeadline] = useState(
+    TaskDeadline.toISOString()
   ); // Datetime-local input
   const [editedTaskDescription, setEditedTaskDescription] = useState(TaskDescription);
   const currentDate = new Date();
@@ -73,30 +86,34 @@ export default function PendingForm({
   const HandleSaveUpdateTask = async (
     _id: string,
     editedTaskName: string,
-    editedDeadline: string,
+    editedTaskDeadline: string,
     editedTaskDescription: string
   ) => {
     try {
+      const newTaskDeadline = new Date(editedTaskDeadline);
       // Update from Client
       if (onEdit) {
-        const newTaskDeadline = new Date(editedDeadline);
         onEdit(_id, editedTaskName, newTaskDeadline, editedTaskDescription);
       }
 
-      // Pass _id and other updated task properties
-      const response = await fetch(`http://localhost:3000/tasks/${_id}`, {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          TaskName: editedTaskName,
-          TaskDeadline: editedDeadline,
-          TaskDescription: editedTaskDescription,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update task");
+      if (
+        editedTaskName !== TaskName ||
+        newTaskDeadline.getTime() !== TaskDeadline.getTime()
+      ) {
+        // Pass _id and other updated task properties
+        const response = await fetch(`http://localhost:3000/tasks/${_id}`, {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            TaskName: editedTaskName,
+            TaskDeadline: editedTaskDeadline,
+            TaskDescription: editedTaskDescription,
+          }),
+        });
+        if (!response.ok) {
+          throw new Error("Failed to update task");
+        }
       }
 
       setIsEditing(false);
@@ -146,8 +163,9 @@ export default function PendingForm({
   };
 
   // Format Date
-  const formatDate = (TaskDeadline: Date) => {
+  const formatDateDisplay = (TaskDeadline: Date) => {
     // Retrieve and Format Date & Time
+
     const year = TaskDeadline.getFullYear();
 
     const month = (TaskDeadline.getMonth() + 1).toString().padStart(2, "0");
@@ -165,6 +183,15 @@ export default function PendingForm({
 
     return { formattedDate, formattedTime };
   };
+
+  const formatDateInput = (editedTaskDeadline: string) => {
+    const editedDate = new Date(editedTaskDeadline);
+    const offsetDate = new Date(
+      editedDate.getTime() - editedDate.getTimezoneOffset() * 60000
+    );
+    return offsetDate.toISOString().slice(0, 16); // Format as YYYY-MM-DDTHH:mm
+  };
+
   return (
     <div
       className={`inline-block min-h-[327px] max-w-[339px] w-full ${color} rounded-form-radius`}
@@ -190,8 +217,8 @@ export default function PendingForm({
               />
               <input
                 type="datetime-local"
-                value={editedDeadline}
-                onChange={(e) => setEditedDeadline(e.target.value)}
+                value={formatDateInput(editedTaskDeadline)}
+                onChange={(e) => setEditedTaskDeadline(e.target.value)}
                 className="text-l text-center text-black w-full m-1"
               />
             </div>
@@ -210,11 +237,11 @@ export default function PendingForm({
                 HandleSaveUpdateTask(
                   _id,
                   editedTaskName,
-                  editedDeadline,
+                  editedTaskDeadline,
                   editedTaskDescription
                 )
               }
-              disabled={!editedTaskName || !editedTaskDescription}
+              disabled={!editedTaskName || !editedTaskDeadline}
               className="bg-button-red p-1 rounded-lg hover:bg-red-900 disabled:bg-red-900 font-semibold"
             >
               Save
@@ -241,10 +268,10 @@ export default function PendingForm({
             <div className="mx-auto my-auto">
               <p className="text-xl text-center font-semibold">{`${TaskName}`}</p>
               <p className="text-xl text-center text-red-800 font-bold">
-                {formatDate(TaskDeadline).formattedDate}
+                {formatDateDisplay(TaskDeadline).formattedDate}
               </p>
               <p className="text-xl text-center text-red-800 font-bold">
-                {formatDate(TaskDeadline).formattedTime}
+                {formatDateDisplay(TaskDeadline).formattedTime}
               </p>
             </div>
           </div>

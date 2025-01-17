@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import Navigation from "../Components/Navigation";
 import FinishedForm from "../Components/FinishedForm";
 import PendingForm from "../Components/PendingForm";
-import { ZnewTaskSchemaClient } from "../../../lib/types";
+import { ZFetchTasksSchemaClient } from "../../../lib/types";
 export default function TaskViewPage() {
   const location = useLocation();
   const taskID = location.state?.id;
@@ -29,7 +29,7 @@ export default function TaskViewPage() {
 
         data.modifiedData.forEach((task: TtaskProps) => {
           // Validate the data coming from the server using the newTaskSchemaClient zod schema
-          const parseResult = ZnewTaskSchemaClient.safeParse(task);
+          const parseResult = ZFetchTasksSchemaClient.safeParse(task);
           if (!parseResult.success) {
             throw new Error("Incorrect data");
           } else {

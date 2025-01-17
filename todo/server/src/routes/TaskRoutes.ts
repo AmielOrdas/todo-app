@@ -1,5 +1,9 @@
 import express, { Request, Response } from "express";
-import { ZnewTaskSchemaServer, TImage } from "../../../lib/serverTypes";
+import {
+  ZEditNewTaskSchemaServer,
+  ZCreateNewTaskSchemaServer,
+  TImage,
+} from "../../../lib/serverTypes";
 import { validateData, authenticateUser } from "../../../lib/middleware";
 import multer from "multer"; // This is a middleware for processing files coming from multipart/form-data
 import { connectMongoAtlas, getDBVariables } from "../database/db";
@@ -32,7 +36,7 @@ router.post(
   "/",
   authenticateUser,
   upload.single("TaskImage"), // Upload the file passed from the "TaskImage" field in assets
-  validateData(ZnewTaskSchemaServer),
+  validateData(ZCreateNewTaskSchemaServer),
   async (req: Request, res: Response) => {
     await connectMongoAtlas();
     const { TaskCollection } = getDBVariables();
@@ -184,42 +188,45 @@ router
     }
   })
   // This route is responsible for editing a task
-  .put(authenticateUser, async (req: Request, res: Response) => {
-    // Retrieve ID and Key/Value Pairs
-    const { id } = req.params;
-    const { TaskName, TaskDeadline, TaskDescription } = req.body;
-    // Retrieve User ID from cookie
-    const userID = req.user?._id;
+  .put(
+    authenticateUser,
+    validateData(ZEditNewTaskSchemaServer),
+    async (req: Request, res: Response) => {
+      // Retrieve ID and Key/Value Pairs
+      const { id } = req.params;
+      const { TaskName, TaskDeadline, TaskDescription } = req.body;
+      // Retrieve User ID from cookie
+      const userID = req.user?._id;
 
-    try {
-      // Connect to Database
-      await connectMongoAtlas();
-      // Get TaskCollection
-      const { TaskCollection } = getDBVariables();
+      try {
+        // Connect to Database
+        await connectMongoAtlas();
+        // Get TaskCollection
+        const { TaskCollection } = getDBVariables();
 
-      // Update Task
-      const result = await TaskCollection.updateOne(
-        { _id: new ObjectId(id), userID },
-        {
-          $set: {
-            name: TaskName,
-            deadline: TaskDeadline,
-            description: TaskDescription,
-          },
+        // Update Task
+        const result = await TaskCollection.updateOne(
+          { _id: new ObjectId(id), userID },
+          {
+            $set: {
+              name: TaskName,
+              deadline: TaskDeadline,
+              description: TaskDescription,
+            },
+          }
+        );
+        // Check if task has found in database
+        if (result.matchedCount === 0) {
+          return res
+            .status(404)
+            .json({ message: "Task not found in the database or Unauthorized" });
         }
-      );
-
-      // Check if task has found in database
-      if (result.matchedCount === 0) {
-        return res
-          .status(404)
-          .json({ message: "Task not found in the database or Unauthorized" });
+        return res.status(200).json({ message: "Task updated successfully" });
+      } catch (error) {
+        console.error(error);
       }
-      return res.status(200).json({ message: "Task updated successfully" });
-    } catch (error) {
-      console.error(error);
     }
-  })
+  )
   // This route is responsible for deleting a task
   .delete(authenticateUser, async (req: Request, res: Response) => {
     // Retrieve Task ID

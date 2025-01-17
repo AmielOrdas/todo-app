@@ -2,7 +2,7 @@ import Navigation from "../Components/Navigation";
 import { useEffect, useState } from "react";
 import { TtaskProps } from "../../../lib/types";
 import FinishedForm from "../Components/FinishedForm";
-import { ZnewTaskSchemaClient } from "../../../lib/types";
+import { ZFetchTasksSchemaClient } from "../../../lib/types";
 export default function TaskFinishedPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const tasksPerPage = 4;
@@ -27,7 +27,7 @@ export default function TaskFinishedPage() {
 
         // Validate the data coming from the server using the newTaskSchemaClient zod schema
         data.modifiedData.forEach((task: TtaskProps) => {
-          const parseResult = ZnewTaskSchemaClient.safeParse(task);
+          const parseResult = ZFetchTasksSchemaClient.safeParse(task);
           if (!parseResult.success) {
             throw new Error("Incorrect data");
           } else {

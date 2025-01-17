@@ -3,7 +3,7 @@ import { TtaskProps } from "../../../lib/types";
 import Navigation from "../Components/Navigation";
 import PendingForm from "../Components/PendingForm";
 import "../index.css";
-import { ZnewTaskSchemaClient } from "../../../lib/types";
+import { ZFetchTasksSchemaClient } from "../../../lib/types";
 export default function TaskPendingPage() {
   // Make the Props Dynamic by Stateful Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,10 +27,10 @@ export default function TaskPendingPage() {
         if (!response.ok) {
           throw new Error("Failed to fetch pending tasks");
         }
-        console.log(data.modifiedData);
         data.modifiedData.forEach((task: TtaskProps) => {
           // Validate the data coming from the server using the newTaskSchemaClient zod schema
-          const parseResult = ZnewTaskSchemaClient.safeParse(task);
+          const parseResult = ZFetchTasksSchemaClient.safeParse(task);
+
           if (!parseResult.success) {
             throw new Error("Incorrect data");
           } else {
@@ -62,17 +62,16 @@ export default function TaskPendingPage() {
     if (pendingTasks.length > 1) {
       // Check if the tasks are already sorted
       const isAlreadySorted = pendingTasks.every(
-        (task, index) =>
+        (currentTask, index) =>
           index === 0 ||
-          pendingTasks[index - 1].TaskDeadline.getTime() <=
-            task.TaskDeadline.getTime()
+          currentTask.TaskDeadline.getTime() >=
+            pendingTasks[index - 1].TaskDeadline.getTime()
       );
 
       // Only update state if tasks are not already sorted
       if (!isAlreadySorted) {
         const updatedTasks = [...pendingTasks].sort(
-          (task1, task2) =>
-            task1.TaskDeadline.getTime() - task2.TaskDeadline.getTime()
+          (task1, task2) => task1.TaskDeadline.getTime() - task2.TaskDeadline.getTime()
         );
         setPendingTasks(updatedTasks); // Update state directly
       }

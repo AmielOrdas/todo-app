@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form"; // react-hook-form is a library used to create forms easily.
 import { useEffect, useRef } from "react";
 import {
-  TnewTaskSchemaClient,
-  ZnewTaskSchemaClient,
+  TCreateNewTaskSchemaClient,
+  ZCreateNewTaskSchemaClient,
   TTaskImage,
 } from "../../../lib/types";
 
@@ -18,14 +18,14 @@ export default function TodoForm() {
     watch,
     trigger,
     resetField,
-  } = useForm<TnewTaskSchemaClient>({
-    resolver: zodResolver(ZnewTaskSchemaClient), // This means that useForm will use the newTaskSchemaClient zod schema to validate the form data.
+  } = useForm<TCreateNewTaskSchemaClient>({
+    resolver: zodResolver(ZCreateNewTaskSchemaClient), // This means that useForm will use the CreateNewTaskSchemaClient zod schema to validate the form data.
   });
   const previousError = useRef<string | undefined>(undefined);
 
   const taskImage: TTaskImage = watch("TaskImage");
 
-  async function SubmitData(data: TnewTaskSchemaClient) {
+  async function SubmitData(data: TCreateNewTaskSchemaClient) {
     const formData = new FormData(); // This line of code allows us to send files to the server. Without this, we can only send string or numerical values (text, dates, age, email)
 
     // Attach the form data of the user to the formData variable.

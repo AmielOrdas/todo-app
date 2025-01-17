@@ -36,7 +36,7 @@ export const ZsignupSchema = z
 if (typeof window !== "undefined") {
 }
 
-export const ZnewTaskSchemaClient = z.object({
+export const ZCreateNewTaskSchemaClient = z.object({
   TaskName: z
     .string({
       invalid_type_error: "Task Name must be a string",
@@ -71,6 +71,7 @@ export const ZnewTaskSchemaClient = z.object({
       (value) => {
         // Check if there is no file
         if (!value) {
+          console.log("XD");
           return true;
           // Check if the file is a FileList type
         } else if (value instanceof FileList) {
@@ -81,6 +82,72 @@ export const ZnewTaskSchemaClient = z.object({
           // Check if the file is a file type
         } else if (value instanceof File) {
           const file = value;
+          console.log("XDD");
+          return TImage.includes(file.type);
+        }
+      },
+      {
+        message: "Must be an image (JPEG, PNG, GIF)",
+      }
+    )
+    .refine(
+      (value) => {
+        // Check if there is no file
+        if (!value) {
+          return true;
+        }
+        // Check if the file is a FileList type
+        if (value instanceof FileList) {
+          const fileList = value;
+          const file = fileList[0];
+          if (fileList.length === 0) return true;
+          return file.size < 2 * 1024 ** 2;
+        } else if (value instanceof File) {
+          const file = value;
+          return file.size < 2 * 1024 ** 2;
+        }
+      },
+      { message: "File size must be less than 2MB" }
+    ),
+});
+
+export const ZFetchTasksSchemaClient = z.object({
+  TaskName: z
+    .string({
+      invalid_type_error: "Task Name must be a string",
+    })
+    .min(1, {
+      message: "Task Name is required",
+    })
+    .refine((value) => value.trim().length > 0, {
+      message: "Task Name cannot be blank",
+    }),
+
+  TaskDeadline: z
+    .string({ required_error: "Task Deadline must be a string" })
+    .min(1, { message: "Task Deadline is required" }),
+  TaskDescription: z.string({
+    invalid_type_error: "Task Description must be a string",
+  }),
+  TaskImage: z
+    .union([z.instanceof(FileList), z.instanceof(File)])
+    .nullable()
+    .optional()
+    .refine(
+      (value) => {
+        // Check if there is no file
+        if (!value) {
+          return true;
+          // Check if the file is a FileList type
+        } else if (value instanceof FileList) {
+          const fileList = value;
+          if (fileList.length === 0) return true;
+          const file = fileList[0];
+          return TImage.includes(file.type);
+          // Check if the file is a file type
+        } else if (value instanceof File) {
+          const file = value;
+          console.log("XDD");
           return TImage.includes(file.type);
         }
       },
@@ -111,7 +178,7 @@ export const ZnewTaskSchemaClient = z.object({
 
 export type TloginSignupSchema = z.infer<typeof ZloginSchema>;
 
-export type TnewTaskSchemaClient = z.infer<typeof ZnewTaskSchemaClient>;
+export type TCreateNewTaskSchemaClient = z.infer<typeof ZCreateNewTaskSchemaClient>;
 
 export type TTaskImage = FileList | File | null | undefined;
 
