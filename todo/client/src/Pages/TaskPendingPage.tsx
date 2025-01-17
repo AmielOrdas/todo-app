@@ -27,6 +27,7 @@ export default function TaskPendingPage() {
         if (!response.ok) {
           throw new Error("Failed to fetch pending tasks");
         }
+        console.log(data.modifiedData);
         data.modifiedData.forEach((task: TtaskProps) => {
           // Validate the data coming from the server using the newTaskSchemaClient zod schema
           const parseResult = ZnewTaskSchemaClient.safeParse(task);
@@ -38,6 +39,14 @@ export default function TaskPendingPage() {
           }
         });
 
+        // Sort tasks by date if tasks is more than one
+        if (data.modifiedData.length > 1) {
+          data.modifiedData.sort(
+            (task1: TtaskProps, task2: TtaskProps) =>
+              task1.TaskDeadline.getTime() - task2.TaskDeadline.getTime()
+          );
+        }
+
         // Update Pending Tasks
         setPendingTasks(data.modifiedData);
       } catch (error) {
@@ -47,6 +56,28 @@ export default function TaskPendingPage() {
     // Execute Fetching
     fetchPendingTasks();
   }, []);
+
+  useEffect(() => {
+    // Sort tasks by date if tasks is more than one
+    if (pendingTasks.length > 1) {
+      // Check if the tasks are already sorted
+      const isAlreadySorted = pendingTasks.every(
+        (task, index) =>
+          index === 0 ||
+          pendingTasks[index - 1].TaskDeadline.getTime() <=
+            task.TaskDeadline.getTime()
+      );
+
+      // Only update state if tasks are not already sorted
+      if (!isAlreadySorted) {
+        const updatedTasks = [...pendingTasks].sort(
+          (task1, task2) =>
+            task1.TaskDeadline.getTime() - task2.TaskDeadline.getTime()
+        );
+        setPendingTasks(updatedTasks); // Update state directly
+      }
+    }
+  }, [pendingTasks]);
 
   // Function for editing pending task properties
   const handleEdit = (
