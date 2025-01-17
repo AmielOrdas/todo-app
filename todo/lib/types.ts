@@ -65,6 +65,7 @@ export const ZnewTaskSchemaClient = z.object({
   }),
   TaskImage: z
     .union([z.instanceof(FileList), z.instanceof(File)])
+    .nullable()
     .optional()
     .refine(
       (value) => {
@@ -112,7 +113,7 @@ export type TloginSignupSchema = z.infer<typeof ZloginSchema>;
 
 export type TnewTaskSchemaClient = z.infer<typeof ZnewTaskSchemaClient>;
 
-export type TTaskImage = FileList | File | undefined;
+export type TTaskImage = FileList | File | null | undefined;
 
 export const TImage = ["image/jpeg", "image/png", "image/gif"];
 
