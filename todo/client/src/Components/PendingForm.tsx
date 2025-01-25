@@ -207,19 +207,19 @@ export default function PendingForm({
             ) : (
               <img src={logo} className="w-[90px] h-[90px]" />
             )}
-            <div className="mx-auto my-auto">
+            <div className="overflow-hidden mx-auto my-auto">
               <input
                 type="text"
                 value={editedTaskName}
                 onChange={(e) => setEditedTaskName(e.target.value)}
                 placeholder="Edit Task Name"
-                className="text-xl w-full overflow-hidden m-1"
+                className="text-xl w-full m-1 "
               />
               <input
                 type="datetime-local"
                 value={formatDateInput(editedTaskDeadline)}
                 onChange={(e) => setEditedTaskDeadline(e.target.value)}
-                className="text-l text-center text-black w-full m-1"
+                className="text-l text-center text-black w-full m-1 pr-1"
               />
             </div>
           </div>
