@@ -33,7 +33,8 @@ export default function PendingForm({
   const [editedTaskDeadline, setEditedTaskDeadline] = useState(
     TaskDeadline.toISOString()
   ); // Datetime-local input
-  const [editedTaskDescription, setEditedTaskDescription] = useState(TaskDescription);
+  const [editedTaskDescription, setEditedTaskDescription] =
+    useState(TaskDescription);
   const currentDate = new Date();
   // Stateful Variable for Checking if Task Lapsed
   const [color, setColor] = useState<String>(
@@ -65,14 +66,17 @@ export default function PendingForm({
       }
 
       // Pass _id to set task to done via server
-      const response = await fetch(`http://localhost:3000/tasks/${_id}/ModifyIsPending`, {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          isPending: false,
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:3000/tasks/${_id}/ModifyIsPending`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            isPending: false,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to delete task");
@@ -150,7 +154,11 @@ export default function PendingForm({
     }
   };
 
-  const HandleViewTask = (_id: string, TaskName: string, isPending: boolean) => {
+  const HandleViewTask = (
+    _id: string,
+    TaskName: string,
+    isPending: boolean
+  ) => {
     navigate(`/task/${encodeURIComponent(TaskName)}`, {
       state: { id: _id, isPending: isPending },
     });
@@ -179,7 +187,9 @@ export default function PendingForm({
     hour = hour ? hour : 12;
     // Set Formatted Date and Time
     const formattedDate = `Due: ${year}-${month}-${day}`;
-    const formattedTime = `${hour < 10 ? `0${hour}` : hour}:${minutes} ${timeSuffix}`;
+    const formattedTime = `${
+      hour < 10 ? `0${hour}` : hour
+    }:${minutes} ${timeSuffix}`;
 
     return { formattedDate, formattedTime };
   };
@@ -205,7 +215,7 @@ export default function PendingForm({
                 src={`data:image/ [image format];base64,${ImageData}`}
               />
             ) : (
-              <img src={logo} className="w-[90px] h-[90px]" />
+              <img src={logo} className="w-[109px] h-[109px]" />
             )}
             <div className="overflow-hidden mx-auto my-auto">
               <input
