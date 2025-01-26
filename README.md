@@ -1,6 +1,6 @@
 # Introduction
 
-This repository is a test project by creating a todo app.
+A todo-app created using MERN (MongoDB, Express.js, React, and Node.js) stack with Tailwind CSS
 
 # Login Page
 
